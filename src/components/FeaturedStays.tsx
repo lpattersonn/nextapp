@@ -35,7 +35,7 @@ function StayCard({ stay }: { stay: Stay }) {
         />
 
         {stay.badge && (
-          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[16px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
+          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[14px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
             {stay.badge}
           </span>
         )}
