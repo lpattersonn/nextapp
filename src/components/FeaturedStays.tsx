@@ -35,7 +35,7 @@ function StayCard({ stay }: { stay: Stay }) {
         />
 
         {stay.badge && (
-          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[10px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
+          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[16px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
             {stay.badge}
           </span>
         )}
@@ -81,13 +81,13 @@ function StayCard({ stay }: { stay: Stay }) {
           {stay.name}
         </h4>
         {stay.price && (
-          <p className="text-[13px] text-[#5A4A3A] mb-2">
+          <p className="text-[16px] text-[#5A4A3A] mb-2">
             Starting at{" "}
             <span className="font-semibold text-[#1C1410]">${stay.price}</span>{" "}
             night
           </p>
         )}
-        <p className="text-[12px] text-[#8A7968] flex items-center gap-2 flex-wrap">
+        <p className="text-[16px] text-[#8A7968] flex items-center gap-2 flex-wrap">
           <span>{stay.type}</span>
           <span className="text-[#D0C8BD]">|</span>
           <span className="flex items-center gap-1">
@@ -117,7 +117,7 @@ function LocationGroup({ title, stays, href = "/stays" }: { title: string; stays
         </h3>
         <Link
           href={href}
-          className="text-[12px] text-[#7B5B3A] font-medium tracking-[0.04em] border border-[#C4A882] px-4 py-1.5 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors"
+          className="text-[16px] text-[#7B5B3A] font-medium tracking-[0.04em] border border-[#C4A882] px-4 py-1.5 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors"
         >
           More Listings →
         </Link>
@@ -300,19 +300,19 @@ export default function FeaturedStays() {
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-16">
           {/* Left: Section intro — sticky */}
           <div className="lg:sticky lg:top-24 lg:self-start">
-            <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">
+            <p className="text-[16px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">
               Discover
             </p>
             <h2 className="font-[family-name:var(--font-playfair)] text-[44px] font-normal text-[#1C1410] leading-[1.1] mb-5">
               Featured Stays
             </h2>
-            <p className="text-[14px] text-[#8A7968] leading-[1.85] mb-8">
+            <p className="text-[16px] text-[#8A7968] leading-[1.85] mb-8">
               The Cohost homes across the High Desert—each one thoughtfully
               managed and beautifully designed for a 5-star guest experience.
             </p>
             <Link
               href="/stays"
-              className="inline-block px-6 py-2.5 border border-[#7B5B3A] text-[#7B5B3A] text-[12px] font-semibold tracking-[0.1em] uppercase hover:bg-[#7B5B3A] hover:text-white transition-colors"
+              className="inline-block px-6 py-2.5 border border-[#7B5B3A] text-[#7B5B3A] text-[16px] font-semibold tracking-[0.1em] uppercase hover:bg-[#7B5B3A] hover:text-white transition-colors"
             >
               View All Listings →
             </Link>
@@ -328,7 +328,7 @@ export default function FeaturedStays() {
             <div className="mt-8 text-center">
               <Link
                 href="/stays"
-                className="inline-block px-10 py-3.5 bg-[#7B5B3A] text-white text-[12px] font-semibold tracking-[0.12em] uppercase hover:bg-[#5A3E28] transition-colors"
+                className="inline-block px-10 py-3.5 bg-[#7B5B3A] text-white text-[16px] font-semibold tracking-[0.12em] uppercase hover:bg-[#5A3E28] transition-colors"
               >
                 View All 129 Listings
               </Link>

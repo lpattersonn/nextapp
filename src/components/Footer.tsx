@@ -72,7 +72,7 @@ export default function Footer() {
                 unoptimized
               />
             </div>
-            <p className="text-[13px] text-[#5A4A3A] leading-snug mb-5">
+            <p className="text-[16px] text-[#5A4A3A] leading-snug mb-5">
               Pioneering Airbnb in Joshua Tree<br />since 2014
             </p>
             <div className="flex gap-3">
@@ -101,13 +101,13 @@ export default function Footer() {
 
           {/* Col 2 — Quick Menu */}
           <div>
-            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
+            <h5 className="text-[16px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
               Quick Menu
             </h5>
             <ul className="space-y-[14px]">
               {quickLinks.map((item) => (
                 <li key={item.label}>
-                  <Link href={item.href} className="text-[14px] text-[#3A2F25] hover:text-[#7B5B3A] transition-colors">
+                  <Link href={item.href} className="text-[16px] text-[#3A2F25] hover:text-[#7B5B3A] transition-colors">
                     {item.label}
                   </Link>
                 </li>
@@ -117,7 +117,7 @@ export default function Footer() {
 
           {/* Col 3 — Stays with pin icons */}
           <div>
-            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
+            <h5 className="text-[16px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
               Stays
             </h5>
             <ul className="space-y-4">
@@ -136,12 +136,12 @@ export default function Footer() {
 
           {/* Col 4 — Contact */}
           <div>
-            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
+            <h5 className="text-[16px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
               Contact Us
             </h5>
             <Link href="mailto:reservations@thecohostcompany.com" className="flex items-center gap-3 group">
               <EnvelopeIcon />
-              <span className="text-[13px] text-[#3A2F25] group-hover:text-[#7B5B3A] transition-colors leading-snug">
+              <span className="text-[16px] text-[#3A2F25] group-hover:text-[#7B5B3A] transition-colors leading-snug">
                 reservations@thecohostcompany.com
               </span>
             </Link>
@@ -152,7 +152,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="relative z-10 bg-[#3D1810]">
-        <div className="max-w-[1240px] mx-auto px-10 py-4 flex flex-col sm:flex-row sm:justify-between items-center gap-2 text-[12px] text-white/75">
+        <div className="max-w-[1240px] mx-auto px-10 py-4 flex flex-col sm:flex-row sm:justify-between items-center gap-2 text-[16px] text-white/75">
           <p>© 2025 The Cohost Company</p>
           <p>
             Website by{" "}

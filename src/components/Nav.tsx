@@ -42,7 +42,7 @@ function DropdownItem({ item }: { item: (typeof navItems)[0] }) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1 text-white text-[13px] font-medium tracking-wide hover:opacity-80 transition-opacity cursor-pointer"
+        className="flex items-center gap-1 text-white text-[16px] font-medium tracking-wide hover:opacity-80 transition-opacity cursor-pointer"
       >
         {item.label}
         <svg
@@ -62,7 +62,7 @@ function DropdownItem({ item }: { item: (typeof navItems)[0] }) {
               key={d}
               href={item.href}
               onClick={() => setOpen(false)}
-              className="block px-4 py-2.5 text-[13px] text-[#3A2F25] hover:bg-[#F7F4EF] hover:text-[#7B5B3A] transition-colors"
+              className="block px-4 py-2.5 text-[16px] text-[#3A2F25] hover:bg-[#F7F4EF] hover:text-[#7B5B3A] transition-colors"
             >
               {d}
             </Link>
@@ -120,7 +120,7 @@ export default function Nav() {
         <div className="hidden md:block shrink-0">
           <Link
             href="#stays"
-            className="px-6 py-2.5 rounded-full bg-[#8D5F52] text-white text-[13px] font-semibold tracking-wide hover:bg-[#7B4F43] transition-colors"
+            className="px-6 py-2.5 rounded-full bg-[#8D5F52] text-white text-[16px] font-semibold tracking-wide hover:bg-[#7B4F43] transition-colors"
           >
             Book Now
           </Link>
