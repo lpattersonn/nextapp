@@ -68,10 +68,11 @@ export default function Hero() {
         </p>
 
         {/* Search bar */}
-        <div className="w-full max-w-[680px] bg-white rounded-full shadow-2xl flex items-center">
+        <div className="w-full max-w-[740px] p-2 rounded-[120px]" style={{ background: "rgba(0,0,0,0.10)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", boxShadow: "0px 4px 8px 0px rgba(0,0,0,0.28), 0px 0px 2px 0px rgba(0,0,0,0.48)" }}>
+        <div className="w-full flex items-center" style={{ padding: "2px", borderRadius: "100px", background: "rgba(247,243,238,0.92)", boxShadow: "0px 4px 24px rgba(0,0,0,0.18)" }}>
           {/* Location */}
-          <label className="flex items-center gap-2.5 px-5 py-[14px] flex-1 border-r border-gray-200 min-w-0 cursor-text">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+          <label className="flex items-center gap-2.5 px-5 py-[7px] flex-1 border-r border-[#C4A882]/40 min-w-0 cursor-text">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
               <circle cx="12" cy="10" r="3" />
             </svg>
@@ -80,12 +81,12 @@ export default function Hero() {
               placeholder="Anywhere"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              className="w-full text-[14px] text-[#2D1B1B] placeholder-gray-400 outline-none bg-transparent"
+              className="w-full text-[14px] text-[#2D1B0E] placeholder-[#9A8A7A] outline-none bg-transparent"
             />
           </label>
           {/* Dates */}
-          <label className="hidden sm:flex items-center gap-2.5 px-5 py-[14px] flex-1 border-r border-gray-200 min-w-0 cursor-text">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+          <label className="hidden sm:flex items-center gap-2.5 px-5 py-[7px] flex-1 border-r border-[#C4A882]/40 min-w-0 cursor-text">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
               <rect x="3" y="4" width="18" height="18" rx="2" />
               <line x1="16" y1="2" x2="16" y2="6" />
               <line x1="8" y1="2" x2="8" y2="6" />
@@ -96,12 +97,12 @@ export default function Hero() {
               placeholder="Anytime"
               value={dates}
               onChange={(e) => setDates(e.target.value)}
-              className="w-full text-[14px] text-[#2D1B1B] placeholder-gray-400 outline-none bg-transparent"
+              className="w-full text-[14px] text-[#2D1B0E] placeholder-[#9A8A7A] outline-none bg-transparent"
             />
           </label>
           {/* Guests */}
-          <label className="hidden sm:flex items-center gap-2.5 px-5 py-[14px] flex-1 min-w-0 cursor-text">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+          <label className="hidden sm:flex items-center gap-2.5 px-5 py-[7px] flex-1 min-w-0 cursor-text">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
@@ -110,13 +111,14 @@ export default function Hero() {
               placeholder="Select Guests"
               value={guests}
               onChange={(e) => setGuests(e.target.value)}
-              className="w-full text-[14px] text-[#2D1B1B] placeholder-gray-400 outline-none bg-transparent"
+              className="w-full text-[14px] text-[#2D1B0E] placeholder-[#9A8A7A] outline-none bg-transparent"
             />
           </label>
           {/* Search button */}
-          <button className="m-1.5 px-7 py-3.5 bg-[#2D1B0E] text-white text-[12px] font-bold tracking-[0.14em] uppercase rounded-full hover:bg-[#1a0f06] transition-colors shrink-0 cursor-pointer">
+          <button className="m-1 px-7 py-2.5 bg-[#2D1B0E] text-white text-[12px] font-bold tracking-[0.14em] uppercase rounded-full hover:bg-[#1a0f06] transition-colors shrink-0 cursor-pointer">
             Search
           </button>
+        </div>
         </div>
       </div>
 
