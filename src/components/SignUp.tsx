@@ -40,10 +40,10 @@ export default function SignUp() {
           </div>
 
           {/* Right: LeadConnector embedded form */}
-          <div className="min-h-[400px]">
+          <div>
             <iframe
               src="https://api.leadconnectorhq.com/widget/form/JMOPYLHw05kL4wVTv6wQ"
-              style={{ width: "100%", height: "400px", border: "none", borderRadius: "0px" }}
+              style={{ width: "100%", height: "260px", border: "none", borderRadius: "0px" }}
               id="inline-JMOPYLHw05kL4wVTv6wQ"
               data-layout='{"id":"INLINE"}'
               data-trigger-type="alwaysShow"
@@ -53,7 +53,7 @@ export default function SignUp() {
               data-deactivation-type="neverDeactivate"
               data-deactivation-value=""
               data-form-name="Website Form - Inline"
-              data-height="400"
+              data-height="260"
               data-layout-iframe-id="inline-JMOPYLHw05kL4wVTv6wQ"
               data-form-id="JMOPYLHw05kL4wVTv6wQ"
               title="Website Form - Inline"
