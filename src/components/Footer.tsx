@@ -51,19 +51,19 @@ export default function Footer() {
           src={`${WP}/2025/05/BG-FOOTER-1.webp`}
           alt="Joshua Tree desert"
           fill
-          className="object-cover object-center"
+          className="object-cover object-bottom"
           unoptimized
         />
-        <div className="absolute inset-0 bg-white/80" />
+        <div className="absolute inset-0 bg-white/65" />
       </div>
 
       {/* Main footer content */}
       <div className="relative z-10 max-w-[1240px] mx-auto px-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 py-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 pt-16 pb-48">
 
           {/* Col 1 — Brand */}
           <div className="flex flex-col items-start">
-            <div className="relative w-[180px] h-[68px] mb-4">
+            <div className="relative w-[200px] h-[80px] mb-5">
               <Image
                 src={`${WP}/2025/05/thecohostcompanylogo.avif`}
                 alt="The Cohost Company"
@@ -101,10 +101,10 @@ export default function Footer() {
 
           {/* Col 2 — Quick Menu */}
           <div>
-            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-5">
+            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
               Quick Menu
             </h5>
-            <ul className="space-y-3">
+            <ul className="space-y-[14px]">
               {quickLinks.map((item) => (
                 <li key={item.label}>
                   <Link href={item.href} className="text-[14px] text-[#3A2F25] hover:text-[#7B5B3A] transition-colors">
@@ -117,7 +117,7 @@ export default function Footer() {
 
           {/* Col 3 — Stays with pin icons */}
           <div>
-            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-5">
+            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
               Stays
             </h5>
             <ul className="space-y-4">
@@ -136,12 +136,12 @@ export default function Footer() {
 
           {/* Col 4 — Contact */}
           <div>
-            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-5">
+            <h5 className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#7B5B3A] mb-6">
               Contact Us
             </h5>
-            <Link href="mailto:reservations@thecohostcompany.com" className="flex items-start gap-3 group">
+            <Link href="mailto:reservations@thecohostcompany.com" className="flex items-center gap-3 group">
               <EnvelopeIcon />
-              <span className="text-[13px] text-[#3A2F25] group-hover:text-[#7B5B3A] transition-colors break-all leading-snug mt-2">
+              <span className="text-[13px] text-[#3A2F25] group-hover:text-[#7B5B3A] transition-colors leading-snug">
                 reservations@thecohostcompany.com
               </span>
             </Link>
