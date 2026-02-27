@@ -7,165 +7,141 @@ const driveItems = [
   { time: "10–20 min", desc: "drive to live music, stargazing spots & desert hikes" },
 ];
 
-function HeartPin() {
-  return (
-    <path
-      d="M0 0C-3.5 0-6 2.5-6 5.5C-6 9.5 0 16 0 16S6 9.5 6 5.5C6 2.5 3.5 0 0 0Z"
-      fill="#C4A882"
-      stroke="#A08060"
-      strokeWidth="0.5"
-    />
-  );
-}
-
 function CaliforniaMap() {
-  return (
-    <svg
-      viewBox="0 0 210 300"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-    >
-      {/* State outline — simplified but recognisable California */}
-      <path
-        d="M40,8 L158,2 L185,28 L196,70 L192,108 L196,142 L188,176
-           L178,205 L168,230 L155,252 L140,268 L124,278 L108,282
-           L92,278 L78,268 L66,254 L56,236 L46,216 L38,196
-           L32,175 L27,153 L22,130 L18,108 L14,86 L12,64
-           L15,44 L25,28 Z"
-        fill="#F7F4EF"
-        stroke="#C4A882"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-
-      {/* Internal county-style lines — horizontal */}
-      {[55, 80, 108, 135, 162, 190, 215, 242].map((y, i) => {
-        const left = i < 3 ? 14 : 20;
-        const right = i > 5 ? 165 : 190;
-        return (
-          <line
-            key={y}
-            x1={left} y1={y} x2={right} y2={y}
-            stroke="#C4A882" strokeWidth="0.5" strokeOpacity="0.35"
-          />
-        );
-      })}
-      {/* Vertical county lines */}
-      {[55, 90, 125, 158].map((x) => (
-        <line
-          key={x}
-          x1={x} y1={30} x2={x} y2={280}
-          stroke="#C4A882" strokeWidth="0.5" strokeOpacity="0.3"
-        />
-      ))}
-
-      {/* "California" diagonal script watermark */}
-      <text
-        x="0"
-        y="0"
-        fontFamily="Georgia, serif"
-        fontSize="38"
-        fill="#C4A882"
-        fillOpacity="0.28"
-        fontStyle="italic"
-        transform="translate(168, 215) rotate(-68)"
-      >
-        California
-      </text>
-
-      {/* Heart pin — High Desert / Joshua Tree area */}
-      <g transform="translate(152, 248)">
-        <HeartPin />
-      </g>
-    </svg>
-  );
-}
-
-function OklahomaMap() {
-  // County grid params
-  const panhandleRight = 68;
-  const panhandleBottom = 68;
-  const bodyRight = 268;
-  const bodyBottom = 162;
-
-  const hLines = [32, 52, 72, 92, 112, 132, 152];
-  const vLines = [92, 118, 144, 170, 196, 222, 248];
+  const hLines = [60, 85, 110, 135, 160, 185, 210, 235, 258, 280];
+  const vLines = [55, 85, 115, 145, 170, 195];
 
   return (
-    <svg
-      viewBox="0 0 278 175"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-    >
+    <svg viewBox="0 0 260 340" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
       <defs>
-        <clipPath id="ok-state">
-          <path d="M4,4 L268,4 L268,162 L68,162 L68,68 L4,68 Z" />
+        <clipPath id="ca-clip">
+          <path d="M48,6 L168,4 L188,18 L196,38 L200,58 L198,80 L202,102
+                   L198,124 L196,148 L190,170 L184,190 L178,208
+                   L170,224 L162,238 L152,252 L140,264 L128,274
+                   L114,280 L100,282 L86,278 L74,268 L64,256
+                   L56,240 L48,222 L42,204 L36,184 L30,162
+                   L26,140 L22,118 L18,96 L16,74 L18,52
+                   L26,34 L36,18 Z" />
         </clipPath>
       </defs>
 
       {/* State fill */}
       <path
-        d="M4,4 L268,4 L268,162 L68,162 L68,68 L4,68 Z"
+        d="M48,6 L168,4 L188,18 L196,38 L200,58 L198,80 L202,102
+           L198,124 L196,148 L190,170 L184,190 L178,208
+           L170,224 L162,238 L152,252 L140,264 L128,274
+           L114,280 L100,282 L86,278 L74,268 L64,256
+           L56,240 L48,222 L42,204 L36,184 L30,162
+           L26,140 L22,118 L18,96 L16,74 L18,52
+           L26,34 L36,18 Z"
         fill="#F7F4EF"
-      />
-
-      {/* County grid lines (clipped inside state) */}
-      {hLines.map((y) => (
-        <line
-          key={y}
-          x1={y < panhandleBottom ? 4 : panhandleRight}
-          y1={y}
-          x2={bodyRight}
-          y2={y}
-          stroke="#C4A882"
-          strokeWidth="0.6"
-          strokeOpacity="0.4"
-          clipPath="url(#ok-state)"
-        />
-      ))}
-      {vLines.map((x) => (
-        <line
-          key={x}
-          x1={x}
-          y1={4}
-          x2={x}
-          y2={bodyBottom}
-          stroke="#C4A882"
-          strokeWidth="0.6"
-          strokeOpacity="0.4"
-        />
-      ))}
-      {/* Panhandle vertical line */}
-      <line x1={4} y1={4} x2={4} y2={panhandleBottom} stroke="#C4A882" strokeWidth="0.6" strokeOpacity="0.4" />
-
-      {/* State border on top */}
-      <path
-        d="M4,4 L268,4 L268,162 L68,162 L68,68 L4,68 Z"
-        fill="none"
         stroke="#C4A882"
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
 
-      {/* "Oklahoma" script watermark */}
+      {/* County grid lines — horizontal */}
+      {hLines.map((y) => (
+        <line key={y} x1="16" y1={y} x2="202" y2={y}
+          stroke="#C4A882" strokeWidth="0.5" strokeOpacity="0.35"
+          clipPath="url(#ca-clip)" />
+      ))}
+      {/* County grid lines — vertical */}
+      {vLines.map((x) => (
+        <line key={x} x1={x} y1="6" x2={x} y2="282"
+          stroke="#C4A882" strokeWidth="0.5" strokeOpacity="0.3"
+          clipPath="url(#ca-clip)" />
+      ))}
+
+      {/* "California" diagonal script watermark */}
       <text
-        x="172"
-        y="52"
+        x="0" y="0"
         fontFamily="Georgia, serif"
-        fontSize="26"
+        fontSize="34"
         fill="#C4A882"
-        fillOpacity="0.35"
+        fillOpacity="0.30"
+        fontStyle="italic"
+        transform="translate(185, 230) rotate(-68)"
+      >
+        California
+      </text>
+
+      {/* Heart pin — High Desert / Joshua Tree area */}
+      <g transform="translate(148, 265)">
+        <path
+          d="M0 0C-3.5 0-6 2.5-6 5.5C-6 9.5 0 16 0 16S6 9.5 6 5.5C6 2.5 3.5 0 0 0Z"
+          fill="#C4A882" stroke="#A08060" strokeWidth="0.5"
+        />
+      </g>
+
+      {/* Small island */}
+      <ellipse cx="110" cy="298" rx="8" ry="4" fill="#F7F4EF" stroke="#C4A882" strokeWidth="1.2" />
+    </svg>
+  );
+}
+
+function OklahomaMap() {
+  const hLines = [72, 92, 112, 132, 152, 168];
+  const vLines = [36, 62, 88, 114, 140, 166, 192, 218, 244];
+
+  return (
+    <svg viewBox="0 0 278 210" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+      <defs>
+        <clipPath id="ok-clip">
+          <path d="M4,54 L68,54 L68,4 L272,4 L272,166 L4,166 Z" />
+        </clipPath>
+      </defs>
+
+      {/* "Oklahoma" script watermark at top */}
+      <text
+        x="172" y="42"
+        fontFamily="Georgia, serif"
+        fontSize="32"
+        fill="#C4A882"
+        fillOpacity="0.45"
         fontStyle="italic"
         textAnchor="middle"
       >
         Oklahoma
       </text>
 
+      {/* State fill */}
+      <path
+        d="M4,54 L68,54 L68,4 L272,4 L272,166 L4,166 Z"
+        fill="#F7F4EF"
+      />
+
+      {/* County grid lines — horizontal */}
+      {hLines.map((y) => (
+        <line key={y} x1={y < 54 ? 68 : 4} y1={y} x2={272} y2={y}
+          stroke="#C4A882" strokeWidth="0.6" strokeOpacity="0.4"
+          clipPath="url(#ok-clip)" />
+      ))}
+      {/* County grid lines — vertical */}
+      {vLines.map((x) => (
+        <line key={x} x1={x} y1="4" x2={x} y2="166"
+          stroke="#C4A882" strokeWidth="0.6" strokeOpacity="0.4"
+          clipPath="url(#ok-clip)" />
+      ))}
+      {/* Panhandle vertical separator */}
+      <line x1="68" y1="4" x2="68" y2="54"
+        stroke="#C4A882" strokeWidth="0.6" strokeOpacity="0.4" />
+
+      {/* State border */}
+      <path
+        d="M4,54 L68,54 L68,4 L272,4 L272,166 L4,166 Z"
+        fill="none"
+        stroke="#C4A882"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+
       {/* Heart pin — Broken Bow (far east OK) */}
-      <g transform="translate(242, 118)">
-        <HeartPin />
+      <g transform="translate(250, 128)">
+        <path
+          d="M0 0C-3.5 0-6 2.5-6 5.5C-6 9.5 0 16 0 16S6 9.5 6 5.5C6 2.5 3.5 0 0 0Z"
+          fill="#C4A882" stroke="#A08060" strokeWidth="0.5"
+        />
       </g>
     </svg>
   );
@@ -187,26 +163,26 @@ export default function Location() {
 
         {/* Top row: two large cards */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-5 mb-5">
-          {/* California card — map + drive times */}
-          <div className="bg-white rounded-2xl overflow-hidden shadow-sm p-8 grid grid-cols-[200px_1fr] gap-6 items-center">
+          {/* California card — drive times + map */}
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm p-8 flex gap-8 items-center">
             {/* Drive times */}
-            <div className="space-y-5">
+            <div className="space-y-6 shrink-0 w-[260px]">
               {driveItems.map((item) => (
-                <div key={item.time} className="flex gap-3 items-start">
-                  <div className="shrink-0 mt-0.5">
-                    <span className="font-semibold text-[#1C1410] text-[16px] block leading-tight">
-                      {item.time}
-                    </span>
-                    <span className="text-[16px] text-[#8A7968] leading-snug block mt-0.5">
-                      {item.desc}
-                    </span>
+                <div key={item.time} className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <span className="font-semibold text-[#1C1410] text-[16px]">{item.time} </span>
+                    <span className="text-[16px] text-[#8A7968]">{item.desc}</span>
+                  </div>
+                  <div className="flex items-center gap-1 mt-[10px] shrink-0">
+                    <div className="w-6 h-px bg-[#C4A882]" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#C4A882]" />
                   </div>
                 </div>
               ))}
             </div>
 
             {/* California map */}
-            <div className="h-[340px]">
+            <div className="flex-1 h-[320px]">
               <CaliforniaMap />
             </div>
           </div>
@@ -218,7 +194,7 @@ export default function Location() {
                 <OklahomaMap />
               </div>
             </div>
-            <div className="px-6 py-5 border-t border-[#F0EBE2] flex items-center justify-between">
+            <div className="px-6 py-5 bg-[#F0EBE3] flex items-center justify-between">
               <div>
                 <p className="text-[16px] tracking-[0.14em] uppercase text-[#8A7968] font-semibold mb-1">
                   Broken Bow, OK – 8 Listings
@@ -240,7 +216,7 @@ export default function Location() {
         {/* Bottom row: two info cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* California info */}
-          <div className="bg-white rounded-2xl px-8 py-7 shadow-sm flex items-center justify-between gap-6">
+          <div className="bg-[#F0EBE3] rounded-2xl px-8 py-7 shadow-sm flex items-center justify-between gap-6">
             <div>
               <p className="text-[16px] text-[#8A7968] mb-2">
                 Pioneertown, Joshua Tree, Yucca Valley, and beyond
@@ -258,7 +234,7 @@ export default function Location() {
           </div>
 
           {/* For hosts */}
-          <div className="bg-white rounded-2xl px-8 py-7 shadow-sm flex items-center justify-between gap-6">
+          <div className="bg-[#F0EBE3] rounded-2xl px-8 py-7 shadow-sm flex items-center justify-between gap-6">
             <div>
               <p className="text-[16px] tracking-[0.14em] uppercase text-[#8A7968] font-semibold mb-2">
                 For Host
