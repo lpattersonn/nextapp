@@ -1,0 +1,144 @@
+"use client";
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+const heroImage = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg";
+
+const pressLogos = [
+  { name: "Logo-01", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-01.svg" },
+  { name: "Logo-02", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-02.svg" },
+  { name: "Logo-03", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-03.svg" },
+  { name: "Logo-04", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-04.svg" },
+  { name: "Logo-05", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-05.svg" },
+];
+
+export default function Hero() {
+  const [location, setLocation] = useState("");
+  const [dates, setDates] = useState("");
+  const [guests, setGuests] = useState("");
+
+  return (
+    <section className="relative h-screen min-h-[700px] overflow-hidden flex flex-col">
+      {/* Background image — static */}
+      <div className="absolute inset-0">
+        <Image
+          src={heroImage}
+          alt="High Desert vacation rentals"
+          fill
+          priority
+          className="object-cover object-center"
+          unoptimized
+        />
+      </div>
+
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 z-[1]"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(15,9,5,0.52) 0%, rgba(15,9,5,0.08) 40%, rgba(15,9,5,0.22) 65%, rgba(15,9,5,0.72) 100%)",
+        }}
+      />
+
+      {/* Center content */}
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center">
+        {/* "For Guests" pill */}
+        <div className="mb-7">
+          <Link
+            href="#stays"
+            className="inline-block px-5 py-2 rounded-full border border-white/65 text-white text-[13px] font-medium tracking-wide hover:bg-white/15 transition-colors"
+          >
+            For Guests
+          </Link>
+        </div>
+
+        {/* Headline */}
+        <h1
+          className="font-[family-name:var(--font-playfair)] text-white font-normal italic leading-[1.08] mb-5 drop-shadow-lg"
+          style={{ fontSize: "clamp(46px, 7.5vw, 88px)" }}
+        >
+          Stay in the Hi-Desert
+        </h1>
+
+        {/* Subtitle */}
+        <p className="text-white/90 text-[16px] leading-[1.75] mb-10 max-w-[540px] drop-shadow">
+          Thoughtfully managed, beautifully designed vacation rentals in<br className="hidden sm:block" />
+          Pioneertown, Joshua Tree, Yucca Valley &amp; beyond
+        </p>
+
+        {/* Search bar */}
+        <div className="w-full max-w-[680px] bg-white rounded-full shadow-2xl flex items-center">
+          {/* Location */}
+          <label className="flex items-center gap-2.5 px-5 py-[14px] flex-1 border-r border-gray-200 min-w-0 cursor-text">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Anywhere"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full text-[14px] text-[#2D1B1B] placeholder-gray-400 outline-none bg-transparent"
+            />
+          </label>
+          {/* Dates */}
+          <label className="hidden sm:flex items-center gap-2.5 px-5 py-[14px] flex-1 border-r border-gray-200 min-w-0 cursor-text">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+              <rect x="3" y="4" width="18" height="18" rx="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Anytime"
+              value={dates}
+              onChange={(e) => setDates(e.target.value)}
+              className="w-full text-[14px] text-[#2D1B1B] placeholder-gray-400 outline-none bg-transparent"
+            />
+          </label>
+          {/* Guests */}
+          <label className="hidden sm:flex items-center gap-2.5 px-5 py-[14px] flex-1 min-w-0 cursor-text">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Select Guests"
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              className="w-full text-[14px] text-[#2D1B1B] placeholder-gray-400 outline-none bg-transparent"
+            />
+          </label>
+          {/* Search button */}
+          <button className="m-1.5 px-7 py-3.5 bg-[#2D1B0E] text-white text-[12px] font-bold tracking-[0.14em] uppercase rounded-full hover:bg-[#1a0f06] transition-colors shrink-0 cursor-pointer">
+            Search
+          </button>
+        </div>
+      </div>
+
+      {/* Press logos */}
+      <div className="relative z-10 pb-8 px-5">
+        <p className="text-center text-white/55 text-[10px] tracking-[0.25em] uppercase mb-4">
+          Featured In
+        </p>
+        <div className="flex items-center justify-center gap-8 flex-wrap">
+          {pressLogos.map((logo) => (
+            <div key={logo.name} className="relative h-5 w-20 opacity-80 hover:opacity-100 transition-opacity brightness-0 invert">
+              <Image
+                src={logo.src}
+                alt={logo.name}
+                fill
+                className="object-contain"
+                unoptimized
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
