@@ -27,8 +27,8 @@ export default function LocalFavorites() {
         <div className="absolute inset-0 bg-[#1C0A04]/82" />
       </div>
 
-      {/* Three-column grid */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-3 h-full">
+      {/* Two-column grid */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 h-full">
         {/* Col 1 — text card */}
         <div className="flex items-center justify-center p-10 lg:p-12">
           <div
@@ -54,18 +54,7 @@ export default function LocalFavorites() {
           </div>
         </div>
 
-        {/* Col 2 — full-bleed landscape photo */}
-        <div className="hidden lg:block relative">
-          <Image
-            src={`${BASE}/2025/10/Local-Recommendations.webp`}
-            alt="Local Recommendations"
-            fill
-            className="object-cover object-center"
-            unoptimized
-          />
-        </div>
-
-        {/* Col 3 — phone mockup with image grid */}
+        {/* Col 2 — phone mockup with image grid */}
         <div className="hidden lg:flex items-center justify-center p-8">
           <div className="relative w-[250px] h-[500px] bg-white rounded-[38px] border-[6px] border-[#111] shadow-2xl overflow-hidden flex flex-col">
             {/* Phone notch */}
