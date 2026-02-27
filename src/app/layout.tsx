@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   title: "The Cohost Company – High Desert Vacation Rentals",
   description:
     "Modern desert retreats to vintage-inspired hideaways in Joshua Tree, Pioneertown & Yucca Valley. Thoughtfully managed, 5-star hosted.",
+  icons: {
+    icon: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logos-.png",
+    shortcut: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logos-.png",
+    apple: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logos-.png",
+  },
 };
 
 export default function RootLayout({

@@ -57,8 +57,8 @@ export default function LocalFavorites() {
         {/* Col 2 — full-bleed landscape photo */}
         <div className="hidden lg:block relative">
           <Image
-            src={`${BASE}/2025/05/Joshua-Tree-National-Park-.webp`}
-            alt="Joshua Tree National Park"
+            src={`${BASE}/2025/10/Local-Recommendations.webp`}
+            alt="Local Recommendations"
             fill
             className="object-cover object-center"
             unoptimized

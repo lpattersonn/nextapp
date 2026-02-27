@@ -88,15 +88,18 @@ export default function Nav() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         background: scrolled
-          ? "rgba(45,27,14,0.97)"
+          ? "rgba(255,255,255,0.08)"
           : "linear-gradient(to bottom, rgba(20,12,6,0.75) 0%, rgba(20,12,6,0.0) 100%)",
-        backdropFilter: scrolled ? "blur(12px)" : "none",
+        backdropFilter: scrolled ? "blur(40px) saturate(180%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(40px) saturate(180%)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.18)" : "none",
+        boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.18)" : "none",
       }}
     >
-      <div className="max-w-[1360px] mx-auto px-8 h-[68px] flex items-center justify-between">
+      <div className="max-w-[1360px] mx-auto px-8 h-[80px] flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center no-underline shrink-0">
-          <CohostLogo className="w-9 h-9" />
+          <CohostLogo className="w-[220px] h-[64px]" />
         </Link>
 
         {/* Desktop nav */}

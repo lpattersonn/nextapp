@@ -48,7 +48,7 @@ export default function Footer() {
       {/* Desert background image */}
       <div className="absolute inset-0">
         <Image
-          src={`${WP}/2025/05/Joshua-Tree-National-Park-.webp`}
+          src={`${WP}/2025/05/BG-FOOTER-1.webp`}
           alt="Joshua Tree desert"
           fill
           className="object-cover object-center"
