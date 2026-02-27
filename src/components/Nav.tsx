@@ -145,7 +145,7 @@ export default function Nav() {
             <Link
               key={item.label}
               href={item.href}
-              className="text-[14px] text-white font-medium"
+              className="text-[16px] text-white font-medium"
               onClick={() => setMenuOpen(false)}
             >
               {item.label}
@@ -153,7 +153,7 @@ export default function Nav() {
           ))}
           <Link
             href="#stays"
-            className="mt-2 px-6 py-3 rounded-full bg-[#8D5F52] text-white text-[13px] font-semibold text-center"
+            className="mt-2 px-6 py-3 rounded-full bg-[#8D5F52] text-white text-[16px] font-semibold text-center"
             onClick={() => setMenuOpen(false)}
           >
             Book Now

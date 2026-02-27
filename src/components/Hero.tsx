@@ -6,11 +6,11 @@ import Link from "next/link";
 const heroImage = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg";
 
 const pressLogos = [
-  { name: "Logo-01", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-01.svg" },
-  { name: "Logo-02", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-02.svg" },
-  { name: "Logo-03", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-03.svg" },
-  { name: "Logo-04", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-04.svg" },
-  { name: "Logo-05", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-05.svg" },
+  { name: "Logo-01", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-01.svg", cls: "h-8 w-36" },
+  { name: "Logo-02", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-02.svg", cls: "h-8 w-44" },
+  { name: "Logo-03", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-03.svg", cls: "h-5 w-20" },
+  { name: "Logo-04", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-04.svg", cls: "h-5 w-20" },
+  { name: "Logo-05", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-05.svg", cls: "h-5 w-20" },
 ];
 
 export default function Hero() {
@@ -127,7 +127,7 @@ export default function Hero() {
         </p>
         <div className="flex items-center justify-center gap-8 flex-wrap">
           {pressLogos.map((logo) => (
-            <div key={logo.name} className="relative h-5 w-20 opacity-80 hover:opacity-100 transition-opacity brightness-0 invert">
+            <div key={logo.name} className={`relative ${logo.cls} opacity-80 hover:opacity-100 transition-opacity brightness-0 invert`}>
               <Image
                 src={logo.src}
                 alt={logo.name}

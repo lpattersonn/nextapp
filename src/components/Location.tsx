@@ -177,7 +177,7 @@ export default function Location() {
       <div className="max-w-[1240px] mx-auto px-10">
         {/* Header */}
         <div className="text-center mb-12">
-          <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-4">
+          <p className="text-[16px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-4">
             Find Us
           </p>
           <h2 className="font-[family-name:var(--font-playfair)] text-[52px] font-normal text-[#1C1410] leading-[1.1]">
@@ -194,10 +194,10 @@ export default function Location() {
               {driveItems.map((item) => (
                 <div key={item.time} className="flex gap-3 items-start">
                   <div className="shrink-0 mt-0.5">
-                    <span className="font-semibold text-[#1C1410] text-[13px] block leading-tight">
+                    <span className="font-semibold text-[#1C1410] text-[16px] block leading-tight">
                       {item.time}
                     </span>
-                    <span className="text-[12px] text-[#8A7968] leading-snug block mt-0.5">
+                    <span className="text-[16px] text-[#8A7968] leading-snug block mt-0.5">
                       {item.desc}
                     </span>
                   </div>
@@ -220,7 +220,7 @@ export default function Location() {
             </div>
             <div className="px-6 py-5 border-t border-[#F0EBE2] flex items-center justify-between">
               <div>
-                <p className="text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-semibold mb-1">
+                <p className="text-[16px] tracking-[0.14em] uppercase text-[#8A7968] font-semibold mb-1">
                   Broken Bow, OK – 8 Listings
                 </p>
                 <h4 className="font-[family-name:var(--font-playfair)] text-[22px] font-normal text-[#1C1410]">
@@ -229,7 +229,7 @@ export default function Location() {
               </div>
               <Link
                 href="#"
-                className="flex items-center gap-1.5 text-[12px] text-[#7B5B3A] font-medium border border-[#C4A882] px-4 py-2 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors whitespace-nowrap"
+                className="flex items-center gap-1.5 text-[16px] text-[#7B5B3A] font-medium border border-[#C4A882] px-4 py-2 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors whitespace-nowrap"
               >
                 View Map ↗
               </Link>
@@ -242,7 +242,7 @@ export default function Location() {
           {/* California info */}
           <div className="bg-white rounded-2xl px-8 py-7 shadow-sm flex items-center justify-between gap-6">
             <div>
-              <p className="text-[12px] text-[#8A7968] mb-2">
+              <p className="text-[16px] text-[#8A7968] mb-2">
                 Pioneertown, Joshua Tree, Yucca Valley, and beyond
               </p>
               <h4 className="font-[family-name:var(--font-playfair)] text-[22px] font-normal text-[#1C1410]">
@@ -251,7 +251,7 @@ export default function Location() {
             </div>
             <Link
               href="#"
-              className="flex items-center gap-1.5 text-[12px] text-[#7B5B3A] font-medium border border-[#C4A882] px-4 py-2 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors whitespace-nowrap shrink-0"
+              className="flex items-center gap-1.5 text-[16px] text-[#7B5B3A] font-medium border border-[#C4A882] px-4 py-2 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors whitespace-nowrap shrink-0"
             >
               View Map ↗
             </Link>
@@ -260,7 +260,7 @@ export default function Location() {
           {/* For hosts */}
           <div className="bg-white rounded-2xl px-8 py-7 shadow-sm flex items-center justify-between gap-6">
             <div>
-              <p className="text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-semibold mb-2">
+              <p className="text-[16px] tracking-[0.14em] uppercase text-[#8A7968] font-semibold mb-2">
                 For Host
               </p>
               <h4 className="font-[family-name:var(--font-playfair)] text-[22px] font-normal text-[#1C1410]">
@@ -269,7 +269,7 @@ export default function Location() {
             </div>
             <Link
               href="/contact"
-              className="flex items-center gap-1.5 text-[12px] text-[#7B5B3A] font-medium border border-[#C4A882] px-4 py-2 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors whitespace-nowrap shrink-0"
+              className="flex items-center gap-1.5 text-[16px] text-[#7B5B3A] font-medium border border-[#C4A882] px-4 py-2 rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors whitespace-nowrap shrink-0"
             >
               Contact Us ↗
             </Link>
