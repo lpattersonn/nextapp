@@ -17,13 +17,17 @@ interface Stay {
   badge?: string;
 }
 
+function slugify(name: string): string {
+  return name.toLowerCase().replace(/'/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
 function StayCard({ stay }: { stay: Stay }) {
   const [current, setCurrent] = useState(0);
   const prev = () => setCurrent((c) => (c - 1 + stay.images.length) % stay.images.length);
   const next = () => setCurrent((c) => (c + 1) % stay.images.length);
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300">
+    <Link href={`/property/${slugify(stay.name)}`} className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300">
       {/* Image + carousel */}
       <div className="relative h-[260px] group overflow-hidden">
         <Image
@@ -104,7 +108,7 @@ function StayCard({ stay }: { stay: Stay }) {
           </span>
         </p>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -296,7 +300,7 @@ const twentyninePalms: Stay[] = [
 export default function FeaturedStays() {
   return (
     <section id="stays" className="py-24 bg-[#F7F4EF]">
-      <div className="max-w-[1240px] mx-auto px-10">
+      <div className="max-w-[1120px] mx-auto px-10">
         <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-16">
           {/* Left: Section intro — sticky */}
           <div className="lg:sticky lg:top-24 lg:self-start">

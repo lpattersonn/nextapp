@@ -3,30 +3,48 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+type DropdownEntry = { label: string; href: string };
+
 const navItems = [
   {
     label: "Stays",
-    href: "#stays",
-    dropdown: ["Pioneertown", "Joshua Tree", "Yucca Valley", "Twentynine Palms"],
+    href: "/stays",
+    dropdown: [
+      { label: "Pioneertown", href: "/stays" },
+      { label: "Joshua Tree", href: "/stays" },
+      { label: "Yucca Valley", href: "/stays" },
+      { label: "Twentynine Palms", href: "/stays" },
+    ],
   },
   {
     label: "Things To Do",
-    href: "#location",
-    dropdown: ["Guidebook", "Virtual Concierge", "Local Favorites"],
+    href: "/guidebook",
+    dropdown: [
+      { label: "Guidebook", href: "/guidebook" },
+      { label: "Virtual Concierge", href: "/guidebook" },
+      { label: "Local Favorites", href: "/#location" },
+    ],
   },
   {
     label: "For Hosts",
-    href: "#services",
-    dropdown: ["Services", "Contact"],
+    href: "/services",
+    dropdown: [
+      { label: "Services", href: "/services" },
+      { label: "Contact", href: "/contact" },
+    ],
   },
   {
     label: "About",
-    href: "#about",
-    dropdown: ["Press", "About Us", "Contact"],
+    href: "/about",
+    dropdown: [
+      { label: "Press", href: "/press" },
+      { label: "About Us", href: "/about" },
+      { label: "Contact", href: "/contact" },
+    ],
   },
 ];
 
-function DropdownItem({ item }: { item: (typeof navItems)[0] }) {
+function DropdownItem({ item }: { item: { label: string; href: string; dropdown: DropdownEntry[] } }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -59,12 +77,12 @@ function DropdownItem({ item }: { item: (typeof navItems)[0] }) {
         <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 w-44 bg-white shadow-xl rounded-sm py-2 z-50">
           {item.dropdown.map((d) => (
             <Link
-              key={d}
-              href={item.href}
+              key={d.label}
+              href={d.href}
               onClick={() => setOpen(false)}
               className="block px-4 py-2.5 text-[16px] text-[#3A2F25] hover:bg-[#F7F4EF] hover:text-[#7B5B3A] transition-colors"
             >
-              {d}
+              {d.label}
             </Link>
           ))}
         </div>
@@ -96,7 +114,7 @@ export default function Nav() {
         boxShadow: scrolled ? "0 4px 32px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.18)" : "none",
       }}
     >
-      <div className="max-w-[1360px] mx-auto px-8 h-[80px] flex items-center justify-between">
+      <div className="max-w-[1120px] mx-auto px-8 h-[80px] flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center no-underline shrink-0">
           <Image
@@ -119,7 +137,7 @@ export default function Nav() {
         {/* Book Now */}
         <div className="hidden md:block shrink-0">
           <Link
-            href="#stays"
+            href="/stays"
             className="px-6 py-2.5 rounded-full bg-[#8D5F52] text-white text-[16px] font-semibold tracking-wide hover:bg-[#7B4F43] transition-colors"
           >
             Book Now
@@ -152,7 +170,7 @@ export default function Nav() {
             </Link>
           ))}
           <Link
-            href="#stays"
+            href="/stays"
             className="mt-2 px-6 py-3 rounded-full bg-[#8D5F52] text-white text-[16px] font-semibold text-center"
             onClick={() => setMenuOpen(false)}
           >

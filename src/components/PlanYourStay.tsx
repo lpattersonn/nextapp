@@ -30,7 +30,7 @@ export default function PlanYourStay() {
       <div className="absolute inset-0 bg-gradient-to-l from-black/70 via-black/40 to-transparent" />
 
       {/* Content – right aligned */}
-      <div className="relative z-10 w-full max-w-[1240px] mx-auto px-10 flex justify-end">
+      <div className="relative z-10 w-full max-w-[1120px] mx-auto px-10 flex justify-end">
         <div className="text-center text-white max-w-[400px]">
           <h2 className="font-[family-name:var(--font-playfair)] text-[50px] font-normal leading-[1.15] mb-8">
             Plan Your Stay<br />with us today!

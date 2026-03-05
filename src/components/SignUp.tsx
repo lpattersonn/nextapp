@@ -18,7 +18,7 @@ export default function SignUp() {
       </div>
 
       {/* Card */}
-      <div className="relative z-10 max-w-[1100px] mx-auto px-6">
+      <div className="relative z-10 max-w-[1120px] mx-auto px-6">
         <div
           className="rounded-2xl px-14 py-14 grid grid-cols-1 md:grid-cols-2 gap-14 items-center"
           style={{

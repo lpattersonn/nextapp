@@ -51,7 +51,7 @@ export default function Benefits() {
         <div className="absolute inset-0 bg-[#1C0A04]/78" />
       </div>
 
-      <div className="relative z-10 max-w-[1240px] mx-auto px-10">
+      <div className="relative z-10 max-w-[1120px] mx-auto px-10">
         <div className="text-center mb-14">
           <p className="text-[11px] tracking-[0.18em] uppercase text-[#C4A882] font-semibold mb-3">
             Book Your Stay

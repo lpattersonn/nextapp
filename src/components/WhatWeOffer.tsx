@@ -41,7 +41,7 @@ const cards = [
 export default function WhatWeOffer() {
   return (
     <section className="py-24 bg-[#F7F4EF]">
-      <div className="max-w-[1240px] mx-auto px-10">
+      <div className="max-w-[1120px] mx-auto px-10">
         <div className="text-center mb-14">
           <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">
             Discover Adventure and Relaxation

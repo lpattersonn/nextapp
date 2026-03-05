@@ -18,7 +18,7 @@ export default function ThankYou() {
 
   return (
     <section className="py-24 bg-[#F9F7F4]">
-      <div className="max-w-[1240px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <div className="max-w-[1120px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
         {/* Text */}
         <div>
           <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">
