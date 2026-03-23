@@ -19,6 +19,8 @@ export interface NearbyItem {
 
 export interface Property {
   slug: string;
+  /** Guesty listing ID — required for live availability & booking */
+  guestyId?: string;
   name: string;
   badge?: string;
   type: string;

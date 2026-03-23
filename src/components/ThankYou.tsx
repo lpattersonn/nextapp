@@ -52,7 +52,7 @@ export default function ThankYou() {
             <p>With love and gratitude,</p>
           </div>
           <div className="mt-7">
-            <div className="font-[family-name:var(--font-playfair)] italic text-[28px] text-[#7B5B3A] mb-1">
+            <div className="font-[family-name:var(--font-playfair)] text-[28px] text-[#7B5B3A] mb-1">
               Josh &amp; Patryk
             </div>
             <div className="text-[11px] tracking-[0.12em] uppercase text-[#8A7968] font-semibold">

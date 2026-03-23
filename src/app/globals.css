@@ -3,14 +3,62 @@
 @theme inline {
   --font-playfair: var(--font-playfair);
   --font-inter: var(--font-inter);
-  --color-brown:        #7B5B3A;
-  --color-brown-dark:   #5A3E28;
-  --color-brown-light:  #C4A882;
-  --color-cream:        #F7F4EF;
-  --color-cream-dark:   #EDE8DF;
-  --color-forest:       #2A1A0A;
-  --color-text:         #3A2F25;
-  --color-muted:        #8A7968;
+
+  /* ── System Colors ── */
+  --color-primary:       #A47B64;
+  --color-secondary:     #FCFBF8;
+  --color-text:          #161A14;
+  --color-button:        #A47B64;
+
+  /* ── Custom ── */
+  --color-theme-hover:   #E8C087;
+
+  /* ── Brand (B) ── */
+  --color-b-25:          #FCFBF8;
+  --color-b-50:          #FBF5F2;
+  --color-b-100:         #EAE2D8;
+  --color-b-200:         #D4C3B3;
+  --color-b-300:         #C4B3A3;
+  --color-b-400:         #B0A38C;
+  --color-b-500:         #AE8A71;
+  --color-b-600:         #A47B64;
+  --color-b-700:         #8D5F52;
+  --color-b-800:         #774D46;
+  --color-b-900:         #633F3D;
+  --color-b-950:         #523633;
+  --color-b-975:         #2D1B18;
+
+  /* ── Secondary (S) ── */
+  --color-s-25:          #FCFBF8;
+  --color-s-50:          #F9F8F1;
+  --color-s-100:         #F1F0E2;
+  --color-s-200:         #D8D5AF;
+  --color-s-300:         #D0CDA0;
+  --color-s-400:         #C4B865;
+  --color-s-500:         #B8AB69;
+  --color-s-600:         #AAA056;
+  --color-s-700:         #967C49;
+  --color-s-800:         #7D6240;
+  --color-s-900:         #685038;
+  --color-s-950:         #564331;
+  --color-s-975:         #302318;
+
+  /* ── Neutral (N) ── */
+  --color-white:         #FFFFFF;
+  --color-n-25:          #FCFCFC;
+  --color-n-50:          #F7F7F7;
+  --color-n-100:         #F5F5F5;
+  --color-n-200:         #E8E8E8;
+  --color-n-300:         #D6D6D6;
+  --color-n-400:         #A3A3A3;
+  --color-n-500:         #737373;
+  --color-n-600:         #525252;
+  --color-n-700:         #424242;
+  --color-n-800:         #292929;
+  --color-n-900:         #141414;
+  --color-n-950:         #0F0F0F;
+  --color-black:         #0A0A0A;
+  --color-menu-bg:       #2D3100;
 }
 
 * {
@@ -23,7 +71,7 @@ html {
 
 body {
   font-family: var(--font-inter), 'Inter', sans-serif;
-  color: #3A2F25;
+  color: var(--color-text);
   background: #ffffff;
   -webkit-font-smoothing: antialiased;
 }

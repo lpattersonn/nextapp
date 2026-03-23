@@ -70,7 +70,7 @@ export default function ServicesPage() {
           <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal text-[18px] tracking-[0.15em] uppercase mb-5">
             We take care of
           </h1>
-          <p className="font-[family-name:var(--font-playfair)] text-white font-normal italic text-[60px] leading-[1.08] mb-6">
+          <p className="font-[family-name:var(--font-playfair)] text-white font-normal text-[60px] leading-[1.08] mb-6">
             Your Home, Your Renter, You.
           </p>
           <p className="text-white/80 text-[17px] leading-[1.75] max-w-[580px] mx-auto mb-10">
@@ -175,7 +175,7 @@ export default function ServicesPage() {
           <div className="absolute inset-0 bg-[#1C0A04]/72" />
         </div>
         <div className="relative z-10 max-w-[1120px] mx-auto px-8 text-center">
-          <h2 className="font-[family-name:var(--font-playfair)] text-[52px] font-normal italic text-white leading-[1.1] mb-6">
+          <h2 className="font-[family-name:var(--font-playfair)] text-[52px] font-normal text-white leading-[1.1] mb-6">
             Ready to get started?
           </h2>
           <p className="text-white/80 text-[17px] leading-[1.75] max-w-[500px] mx-auto mb-10">

@@ -3,8 +3,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-const heroImage = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg";
-
 const pressLogos = [
   { name: "Logo-01", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-01.svg", cls: "h-8 w-36" },
   { name: "Logo-02", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-02.svg", cls: "h-8 w-44" },
@@ -20,25 +18,23 @@ export default function Hero() {
 
   return (
     <section className="relative h-screen min-h-[700px] overflow-hidden flex flex-col">
-      {/* Background image — static */}
+      {/* Background video */}
       <div className="absolute inset-0">
-        <Image
-          src={heroImage}
-          alt="High Desert vacation rentals"
-          fill
-          priority
-          className="object-cover object-center"
-          unoptimized
-        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full h-full object-cover object-center"
+        >
+          <source src="/video/The-Cohost-Hero-Video-new-on-Vimeo-.mp4" type="video/mp4" />
+        </video>
       </div>
 
       {/* Overlay */}
       <div
         className="absolute inset-0 z-[1]"
-        style={{
-          background:
-            "linear-gradient(to bottom, rgba(15,9,5,0.52) 0%, rgba(15,9,5,0.08) 40%, rgba(15,9,5,0.22) 65%, rgba(15,9,5,0.72) 100%)",
-        }}
+        style={{ background: "#00000066", opacity: 0.72 }}
       />
 
       {/* Center content */}
@@ -55,7 +51,7 @@ export default function Hero() {
 
         {/* Headline */}
         <h1
-          className="font-[family-name:var(--font-playfair)] text-white font-normal italic leading-[1.08] mb-5 drop-shadow-lg"
+          className="font-[family-name:var(--font-playfair)] text-white font-normal leading-[1.08] mb-5 drop-shadow-lg"
           style={{ fontSize: "clamp(46px, 7.5vw, 88px)" }}
         >
           Stay in the Hi-Desert

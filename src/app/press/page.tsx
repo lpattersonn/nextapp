@@ -208,7 +208,7 @@ export default function PressPage() {
       {/* Press inquiry CTA */}
       <section className="py-16 bg-[#3D1810] text-center">
         <div className="max-w-[1120px] mx-auto px-8">
-          <h2 className="font-[family-name:var(--font-playfair)] text-[38px] font-normal italic text-white mb-4">
+          <h2 className="font-[family-name:var(--font-playfair)] text-[38px] font-normal text-white mb-4">
             Press Inquiries
           </h2>
           <p className="text-white/75 text-[16px] mb-8 max-w-[480px] mx-auto">

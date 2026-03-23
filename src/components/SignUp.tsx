@@ -29,7 +29,7 @@ export default function SignUp() {
         >
           {/* Left: text */}
           <div className="text-center md:text-left">
-            <h2 className="font-[family-name:var(--font-playfair)] text-[42px] font-normal italic text-white leading-[1.2] mb-5">
+            <h2 className="font-[family-name:var(--font-playfair)] text-[42px] font-normal text-white leading-[1.2] mb-5">
               Sign Up &amp; Get 10% OFF
             </h2>
             <p className="text-[14px] text-white/85 leading-[1.85]">

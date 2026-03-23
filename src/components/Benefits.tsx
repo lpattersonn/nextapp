@@ -72,7 +72,7 @@ export default function Benefits() {
                   {b.icon}
                 </div>
               </div>
-              <h3 className="font-[family-name:var(--font-playfair)] text-[20px] italic font-normal text-[#7B5B3A] mb-4">
+              <h3 className="font-[family-name:var(--font-playfair)] text-[20px] font-normal text-[#7B5B3A] mb-4">
                 {b.title}
               </h3>
               <p className="text-[14px] text-[#5A4A3A] leading-[1.85]">{b.body}</p>

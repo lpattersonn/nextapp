@@ -16,7 +16,7 @@ export default function AboutCohost() {
           <h2 className="font-[family-name:var(--font-playfair)] text-[58px] font-normal text-[#1C1410] leading-[1.05] mb-4">
             The Cohost
           </h2>
-          <p className="font-[family-name:var(--font-playfair)] italic text-[17px] text-[#7B5B3A] mb-7 leading-snug">
+          <p className="font-[family-name:var(--font-playfair)] text-[17px] text-[#7B5B3A] mb-7 leading-snug">
             Pioneertown · Joshua Tree · Yucca Valley And Beyond
           </p>
           <p className="text-[15px] text-[#5A4A3A] leading-[1.85] mb-10">

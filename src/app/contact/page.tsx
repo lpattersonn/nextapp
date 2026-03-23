@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Script from "next/script";
+import ContactForm from "@/components/ContactForm";
 
 const G = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto";
 const BASE = "https://thecohostcompany.com/wp-content/uploads";
@@ -77,7 +78,7 @@ export default function ContactPage() {
         </div>
         <div className="relative z-10 max-w-[1120px] mx-auto px-8 pb-12 w-full">
           <p className="text-[11px] tracking-[0.25em] uppercase text-white/60 mb-3">We&apos;re Here For You</p>
-          <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal italic text-[58px] leading-[1.05]">
+          <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal text-[58px] leading-[1.05]">
             Get in Touch
           </h1>
         </div>
@@ -148,73 +149,7 @@ export default function ContactPage() {
               </div>
             </div>
             <div>
-              <div
-                className="rounded-2xl p-8"
-                style={{ background: "#F7F4EF" }}
-              >
-                <h3 className="font-[family-name:var(--font-playfair)] text-[28px] font-normal text-[#1C1410] mb-8">
-                  Get in Touch
-                </h3>
-                <form className="space-y-5">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">First Name</label>
-                      <input type="text" placeholder="First name" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                    </div>
-                    <div>
-                      <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">Last Name</label>
-                      <input type="text" placeholder="Last name" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">Email Address *</label>
-                    <input type="email" required placeholder="your@email.com" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">Phone Number</label>
-                    <input type="tel" placeholder="+1 (000) 000-0000" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">Subject *</label>
-                    <input type="text" required placeholder="How can we help?" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">Vacation Rental Address</label>
-                    <input type="text" placeholder="Property address" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">Airbnb or VRBO Listing Link</label>
-                    <input type="url" placeholder="https://" className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] placeholder-[#C4A882] outline-none focus:border-[#7B5B3A] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">What can we help you with?</label>
-                    <select className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] outline-none focus:border-[#7B5B3A] transition-colors appearance-none cursor-pointer">
-                      <option value="">Select an option…</option>
-                      <option>Full-service property management</option>
-                      <option>Marketing only</option>
-                      <option>Hosting services</option>
-                      <option>General inquiry</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[12px] tracking-[0.1em] uppercase text-[#8A7968] font-semibold mb-2">How did you hear about us?</label>
-                    <select className="w-full px-4 py-3 rounded-lg bg-white border border-[#EDE8DF] text-[14px] text-[#2D1B0E] outline-none focus:border-[#7B5B3A] transition-colors appearance-none cursor-pointer">
-                      <option value="">Select an option…</option>
-                      <option>Instagram</option>
-                      <option>Google Search</option>
-                      <option>Referral</option>
-                      <option>Press / Media</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full py-4 bg-[#7B5B3A] text-white text-[13px] font-semibold tracking-[0.12em] uppercase hover:bg-[#5A3E28] transition-colors rounded-lg cursor-pointer"
-                  >
-                    Send Message →
-                  </button>
-                </form>
-              </div>
+              <ContactForm />
             </div>
           </div>
         </div>

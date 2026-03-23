@@ -41,7 +41,7 @@ export default function AboutPage() {
         </div>
         <div className="relative z-10 max-w-[1120px] mx-auto px-8 w-full">
           <p className="text-[11px] tracking-[0.25em] uppercase text-white/60 mb-4">About Us</p>
-          <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal italic text-[64px] leading-[1.05] mb-5">
+          <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal text-[64px] leading-[1.05] mb-5">
             Get to know us
           </h1>
           <p className="text-white/85 text-[17px] leading-[1.75] max-w-[520px] mb-8">
@@ -195,7 +195,7 @@ export default function AboutPage() {
         </div>
         <div className="relative z-10 max-w-[1120px] mx-auto px-8 text-center">
           <p className="text-[11px] tracking-[0.25em] uppercase text-[#C4A882] font-semibold mb-5">Our Heritage</p>
-          <h2 className="font-[family-name:var(--font-playfair)] text-[54px] font-normal italic text-white leading-[1.1] mb-6">
+          <h2 className="font-[family-name:var(--font-playfair)] text-[54px] font-normal text-white leading-[1.1] mb-6">
             Pioneering Airbnb in Joshua Tree
           </h2>
           <p className="text-white/80 text-[17px] leading-[1.75] max-w-[600px] mx-auto mb-10">
