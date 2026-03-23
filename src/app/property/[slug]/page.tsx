@@ -2,11 +2,32 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
+import { notFound, useParams, useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { properties, getPropertyBySlug, type Property } from "@/data/properties";
-import type { GuestyQuote } from "@/lib/guesty";
+import type { GuestyQuote, GuestyListingFull } from "@/lib/guesty";
+
+function guestyToProperty(l: GuestyListingFull): Property {
+  return {
+    slug: l._id,
+    guestyId: l._id,
+    name: l.nickname || l.title,
+    type: l.propertyType ?? "Vacation Rental",
+    location: [l.address?.city, l.address?.state].filter(Boolean).join(", "),
+    address: l.address?.full ?? l.address?.city ?? "",
+    guests: l.accommodates ?? 0,
+    beds: l.bedrooms ?? 0,
+    baths: l.bathrooms ?? 0,
+    price: l.prices?.basePrice ? String(l.prices.basePrice) : "0",
+    images: (l.pictures ?? []).slice(0, 12).map((p) => p.original),
+    description: "",
+    highlights: [],
+    amenities: [],
+    nearby: [],
+    houseRules: [],
+  };
+}
 
 // ─── Photo Grid ───────────────────────────────────────────────────────────────
 function PhotoGrid({ images, name }: { images: string[]; name: string }) {
@@ -26,7 +47,7 @@ function PhotoGrid({ images, name }: { images: string[]; name: string }) {
       <div className="relative">
         <div
           className="grid gap-1.5"
-          style={{ gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: "480px" }}
+          style={{ gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: "clamp(280px, 45vw, 480px)" }}
         >
           <div className="row-span-2 relative cursor-pointer overflow-hidden group rounded-l-xl" onClick={() => open(0)}>
             <Image src={main} alt={name} fill className="object-cover group-hover:brightness-95 transition duration-300" unoptimized />
@@ -83,19 +104,28 @@ function BookingWidget({
   guestyId,
   maxGuests,
   propertySlug,
+  dayStatuses = {},
 }: {
   price: string;
   name: string;
   guestyId?: string;
   maxGuests?: number;
   propertySlug: string;
+  dayStatuses?: Record<string, "available" | "unavailable" | "booked" | "blocked">;
 }) {
+  const router = useRouter();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(1);
   const [availStatus, setAvailStatus] = useState<AvailStatus>("idle");
   const [quote, setQuote] = useState<GuestyQuote | null>(null);
   const [checkError, setCheckError] = useState("");
+  // Custom calendar state
+  const [calOpen, setCalOpen] = useState(false);
+  const [selecting, setSelecting] = useState<"in" | "out">("in");
+  const now2 = new Date();
+  const [wcYear, setWcYear] = useState(now2.getFullYear());
+  const [wcMonth, setWcMonth] = useState(now2.getMonth());
 
   const nights = (() => {
     if (!checkIn || !checkOut) return 0;
@@ -159,28 +189,138 @@ function BookingWidget({
 
       {/* Date + guest inputs */}
       <div className="border border-[#E0D8CE] rounded-xl overflow-hidden mb-4">
+        {/* Clickable date display row */}
         <div className="grid grid-cols-2 divide-x divide-[#E0D8CE]">
-          <div className="p-3.5">
-            <label className="block text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-bold mb-1.5">Check In</label>
-            <input
-              type="date"
-              value={checkIn}
-              min={new Date().toISOString().split("T")[0]}
-              onChange={e => setCheckIn(e.target.value)}
-              className="w-full text-[13px] text-[#1C1410] outline-none bg-transparent cursor-pointer"
-            />
-          </div>
-          <div className="p-3.5">
-            <label className="block text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-bold mb-1.5">Check Out</label>
-            <input
-              type="date"
-              value={checkOut}
-              min={checkIn || new Date().toISOString().split("T")[0]}
-              onChange={e => setCheckOut(e.target.value)}
-              className="w-full text-[13px] text-[#1C1410] outline-none bg-transparent cursor-pointer"
-            />
-          </div>
+          <button
+            type="button"
+            onClick={() => { setSelecting("in"); setCalOpen(true); }}
+            className={`p-3.5 text-left transition-colors hover:bg-[#faf7f4] ${calOpen && selecting === "in" ? "bg-[#f7f0e8]" : ""}`}
+          >
+            <p className="text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-bold mb-1.5">Check In</p>
+            <p className={`text-[13px] ${checkIn ? "text-[#1C1410] font-medium" : "text-[#B0A89A]"}`}>
+              {checkIn ? new Date(checkIn + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Add date"}
+            </p>
+          </button>
+          <button
+            type="button"
+            onClick={() => { setSelecting("out"); setCalOpen(true); }}
+            className={`p-3.5 text-left transition-colors hover:bg-[#faf7f4] ${calOpen && selecting === "out" ? "bg-[#f7f0e8]" : ""}`}
+          >
+            <p className="text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-bold mb-1.5">Check Out</p>
+            <p className={`text-[13px] ${checkOut ? "text-[#1C1410] font-medium" : "text-[#B0A89A]"}`}>
+              {checkOut ? new Date(checkOut + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) : "Add date"}
+            </p>
+          </button>
         </div>
+        {/* Inline calendar */}
+        {calOpen && (() => {
+          const todayISO = new Date().toISOString().split("T")[0];
+          const daysInMonth = new Date(wcYear, wcMonth + 1, 0).getDate();
+          const firstDOW = new Date(wcYear, wcMonth, 1).getDay();
+          const MNAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+          const cells: (string | null)[] = [];
+          for (let i = 0; i < firstDOW; i++) cells.push(null);
+          for (let d = 1; d <= daysInMonth; d++) {
+            cells.push(`${wcYear}-${String(wcMonth + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`);
+          }
+          const isPrevDisabled = wcYear === now2.getFullYear() && wcMonth === now2.getMonth();
+          function prevWcMonth() {
+            if (wcMonth === 0) { setWcYear(y => y - 1); setWcMonth(11); }
+            else setWcMonth(m => m - 1);
+          }
+          function nextWcMonth() {
+            if (wcMonth === 11) { setWcYear(y => y + 1); setWcMonth(0); }
+            else setWcMonth(m => m + 1);
+          }
+          function pickDay(iso: string) {
+            if (selecting === "in" || (checkIn && iso <= checkIn)) {
+              setCheckIn(iso);
+              setCheckOut("");
+              setSelecting("out");
+            } else {
+              setCheckOut(iso);
+              setCalOpen(false);
+            }
+          }
+          return (
+            <div className="border-t border-[#E0D8CE] p-4 bg-white">
+              {/* Selecting hint */}
+              <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-[#7B5B3A] mb-3 text-center">
+                {selecting === "in" ? "Select check-in date" : "Select check-out date"}
+              </p>
+              {/* Month nav */}
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={prevWcMonth}
+                  disabled={isPrevDisabled}
+                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#f0e8dc] transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
+                <span className="text-[13px] font-semibold text-[#1C1410]">{MNAMES[wcMonth]} {wcYear}</span>
+                <button
+                  onClick={nextWcMonth}
+                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[#f0e8dc] transition-colors cursor-pointer"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+                </button>
+              </div>
+              {/* Day of week headers */}
+              <div className="grid grid-cols-7 mb-1">
+                {["Su","Mo","Tu","We","Th","Fr","Sa"].map(d => (
+                  <span key={d} className="text-center text-[10px] text-[#8A7968] font-medium py-1">{d}</span>
+                ))}
+              </div>
+              {/* Day cells */}
+              <div className="grid grid-cols-7">
+                {cells.map((iso, i) => {
+                  if (!iso) return <div key={`e${i}`} className="h-8" />;
+                  const st = dayStatuses[iso];
+                  const isUnavail = st === "unavailable" || st === "booked" || st === "blocked";
+                  const isPast = iso < todayISO;
+                  const disabled = isUnavail || isPast;
+                  const isIn = iso === checkIn;
+                  const isOut = iso === checkOut;
+                  const inRange = checkIn && checkOut && iso > checkIn && iso < checkOut;
+                  const day = parseInt(iso.split("-")[2]);
+                  return (
+                    <div key={iso} className={`relative flex items-center justify-center h-8 ${inRange ? "bg-[#f0e8dc]" : ""}`}>
+                      <button
+                        disabled={disabled}
+                        onClick={() => pickDay(iso)}
+                        className={[
+                          "w-7 h-7 rounded-full flex items-center justify-center text-[12px] transition-all",
+                          disabled ? "text-[#C4B8AC] cursor-not-allowed opacity-40" : "cursor-pointer hover:bg-[#e8ddd2]",
+                          isIn || isOut ? "!bg-[#1C1410] !text-white hover:!bg-[#1C1410]" : "",
+                          isUnavail && !isPast ? "line-through" : "",
+                        ].join(" ")}
+                      >
+                        {day}
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Clear + close row */}
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#EDE8DF]">
+                {(checkIn || checkOut) ? (
+                  <button
+                    onClick={() => { setCheckIn(""); setCheckOut(""); setSelecting("in"); }}
+                    className="text-[11px] text-[#8A7968] underline underline-offset-2 hover:text-[#1C1410] transition-colors"
+                  >
+                    Clear dates
+                  </button>
+                ) : <span />}
+                <button
+                  onClick={() => setCalOpen(false)}
+                  className="text-[11px] text-[#7B5B3A] font-semibold hover:text-[#1C1410] transition-colors"
+                >
+                  Close ✕
+                </button>
+              </div>
+            </div>
+          );
+        })()}
         <div className="border-t border-[#E0D8CE] p-3.5 flex items-center justify-between">
           <div>
             <label className="block text-[10px] tracking-[0.14em] uppercase text-[#8A7968] font-bold mb-0.5">Guests</label>
@@ -212,22 +352,20 @@ function BookingWidget({
       )}
       {checkError && <p className="text-[12px] text-red-600 mb-3">{checkError}</p>}
 
-      {availStatus === "available" && guestyId ? (
-        <Link href={checkoutUrl} className="block w-full py-3.5 bg-[#7B5B3A] text-white text-[13px] font-bold tracking-[0.1em] uppercase text-center hover:bg-[#5A3E28] transition-colors rounded-xl mb-3">
-          Book Now →
-        </Link>
-      ) : canCheck && availStatus !== "available" ? (
-        <button
-          onClick={handleCheckAvailability}
-          disabled={availStatus === "checking"}
-          className="w-full py-3.5 bg-[#7B5B3A] text-white text-[13px] font-bold tracking-[0.1em] uppercase text-center hover:bg-[#5A3E28] transition-colors rounded-xl mb-3 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+      {datesReady ? (
+        <Link
+          href={checkoutUrl}
+          className="block w-full py-3.5 bg-[#7B5B3A] text-white text-[13px] font-bold tracking-[0.1em] uppercase text-center hover:bg-[#5A3E28] transition-colors rounded-xl mb-3"
         >
-          {availStatus === "checking" ? "Checking…" : availStatus === "unavailable" ? "Try Again" : "Check Availability"}
-        </button>
-      ) : (
-        <Link href="/contact" className="block w-full py-3.5 bg-[#7B5B3A] text-white text-[13px] font-bold tracking-[0.1em] uppercase text-center hover:bg-[#5A3E28] transition-colors rounded-xl mb-3">
-          {datesReady ? "Check Availability" : "Select Dates"}
+          Reserve
         </Link>
+      ) : (
+        <button
+          onClick={() => { setSelecting("in"); setCalOpen(true); }}
+          className="w-full py-3.5 bg-[#7B5B3A] text-white text-[13px] font-bold tracking-[0.1em] uppercase text-center hover:bg-[#5A3E28] transition-colors rounded-xl mb-3 cursor-pointer"
+        >
+          Reserve
+        </button>
       )}
 
       <p className="text-center text-[11px] text-[#8A7968] mb-4">Best rate guaranteed — book direct &amp; save on OTA fees</p>
@@ -277,6 +415,11 @@ function BookingWidget({
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAY_LABELS = ["Su","Mo","Tu","We","Th","Fr","Sa"];
 
+// Date key format used in dayStatuses map: YYYY-MM-DD
+function toDateKey(year: number, month: number, day: number) {
+  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+}
+
 function CalendarMonth({
   year,
   month,
@@ -284,6 +427,7 @@ function CalendarMonth({
   showRightArrow,
   onPrev,
   onNext,
+  dayStatuses = {},
 }: {
   year: number;
   month: number;
@@ -291,6 +435,8 @@ function CalendarMonth({
   showRightArrow: boolean;
   onPrev: () => void;
   onNext: () => void;
+  /** Map of YYYY-MM-DD → availability status from Guesty */
+  dayStatuses?: Record<string, "available" | "unavailable" | "booked" | "blocked">;
 }) {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -324,11 +470,21 @@ function CalendarMonth({
           if (!d) return <span key={`e-${i}`} />;
           const date = new Date(year, month, d);
           const isPast = date < today;
+          const key = toDateKey(year, month, d);
+          const status = dayStatuses[key];
+
+          let cellClass = "text-[#1C1410] hover:bg-[#f0ebe3] cursor-default";
+          if (isPast) {
+            cellClass = "text-[#C0B8AE]";
+          } else if (status === "booked" || status === "unavailable" || status === "blocked") {
+            cellClass = "bg-[#fde8e8] text-[#b45555] line-through cursor-not-allowed";
+          }
+
           return (
             <div
               key={d}
-              className={`flex items-center justify-center h-8 w-full text-[13px] rounded-full mx-auto
-                ${isPast ? "text-[#C0B8AE]" : "text-[#1C1410] hover:bg-[#f0ebe3] cursor-pointer"}`}
+              title={status && !isPast ? status : undefined}
+              className={`flex items-center justify-center h-8 w-full text-[13px] rounded-full mx-auto transition-colors ${cellClass}`}
             >
               {d}
             </div>
@@ -405,15 +561,35 @@ function PropertyCard({ p }: { p: Property }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function PropertyPage() {
   const params = useParams<{ slug: string }>();
-  const property = getPropertyBySlug(params.slug);
-  if (!property) notFound();
+  const slug = params.slug;
+  const localProp = getPropertyBySlug(slug);
+  const isGuestyId = /^[0-9a-f]{24}$/i.test(slug);
 
-  const [images, setImages] = useState(property.images);
+  const [property, setProperty] = useState<Property | null>(localProp ?? null);
+  const [fetchingGuesty, setFetchingGuesty] = useState(!localProp && isGuestyId);
+  const [images, setImages] = useState<string[]>(localProp?.images ?? []);
   const [showMoreDesc, setShowMoreDesc] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
 
+  // Fetch from Guesty if slug is a Guesty listing ID and not found locally
+  useEffect(() => {
+    if (localProp || !isGuestyId) return;
+    fetch(`/api/guesty/listings/${slug}`)
+      .then((r) => r.ok ? r.json() : Promise.reject())
+      .then((data: GuestyListingFull) => {
+        const p = guestyToProperty(data);
+        setProperty(p);
+        setImages(p.images);
+        setFetchingGuesty(false);
+      })
+      .catch(() => setFetchingGuesty(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
+
   const now = new Date();
   const [calStart, setCalStart] = useState({ year: now.getFullYear(), month: now.getMonth() });
+  // dayStatuses: YYYY-MM-DD → Guesty availability status (fetched lazily)
+  const [dayStatuses, setDayStatuses] = useState<Record<string, "available" | "unavailable" | "booked" | "blocked">>({});
 
   const calSecond = {
     year: calStart.month === 11 ? calStart.year + 1 : calStart.year,
@@ -429,9 +605,9 @@ export default function PropertyPage() {
     month: m.month === 11 ? 0 : m.month + 1,
   }));
 
-  // Fetch live images from Guesty PMS
+  // Fetch live images from Guesty PMS (skip if already loaded from Guesty fallback)
   useEffect(() => {
-    if (!property.guestyId) return;
+    if (!property?.guestyId || !localProp) return; // local props fetch images; Guesty-only already has them
     fetch(`/api/guesty/listings/${property.guestyId}`)
       .then(r => r.json())
       .then(data => {
@@ -440,12 +616,54 @@ export default function PropertyPage() {
         }
       })
       .catch(() => {});
-  }, [property.guestyId]);
+  }, [property?.guestyId]);
+
+  // Fetch 3-month availability calendar from Guesty whenever the displayed months change
+  useEffect(() => {
+    if (!property?.guestyId) return;
+
+    // Fetch from calStart through the end of the month after calSecond (3 months total)
+    const start = new Date(calStart.year, calStart.month, 1);
+    const endRaw = new Date(calStart.year, calStart.month + 3, 0); // last day of month+2
+    const fmt = (d: Date) => d.toISOString().split("T")[0];
+
+    fetch(
+      `/api/guesty/calendar?listingId=${property.guestyId}&startDate=${fmt(start)}&endDate=${fmt(endRaw)}`
+    )
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((data: { days: Array<{ date: string; status: "available" | "unavailable" | "booked" | "blocked" }> }) => {
+        if (Array.isArray(data.days)) {
+          setDayStatuses(prev => {
+            const next = { ...prev };
+            data.days.forEach(d => { next[d.date] = d.status; });
+            return next;
+          });
+        }
+      })
+      .catch(() => {}); // silently fall back to no colour-coding
+  }, [property?.guestyId, calStart]);
+
+  // ── Loading / not-found guards (all hooks above this line) ──
+  if (fetchingGuesty) {
+    return (
+      <>
+        <Nav />
+        <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-10 h-10 border-2 border-[#7B5B3A] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-[#8A7968] text-[14px]">Loading property…</p>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!property) return notFound();
 
   const allProperties = properties.filter(p => p.slug !== property.slug).slice(0, 3);
   const allAmenities = property.amenities.flatMap(g => g.items);
   const visibleAmenities = showAllAmenities ? allAmenities : allAmenities.slice(0, 10);
-  const descParagraphs = property.description.split("\n\n");
+  const descParagraphs = property.description ? property.description.split("\n\n") : [];
   const safetyItems = property.amenities.find(g => g.category === "Safety")?.items ?? [];
 
   return (
@@ -454,13 +672,13 @@ export default function PropertyPage() {
       <div className="h-[80px]" />
 
       {/* Photo Grid */}
-      <div className="max-w-[1240px] mx-auto px-4 pt-4">
+      <div className="max-w-[1120px] mx-auto px-4 pt-4">
         <PhotoGrid images={images} name={property.name} />
       </div>
 
       {/* Main content */}
       <div className="bg-[#FAF8F5] min-h-screen">
-        <div className="max-w-[1240px] mx-auto px-4 py-10">
+        <div className="max-w-[1120px] mx-auto px-4 py-10">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-14">
 
             {/* ── LEFT ── */}
@@ -554,7 +772,7 @@ export default function PropertyPage() {
               {/* Availability */}
               <div className="border-b border-[#EDE8DF] pb-8 mb-8">
                 <h2 className="text-[22px] font-semibold text-[#1C1410] mb-6">Availability</h2>
-                <div className="flex gap-8">
+                <div className="flex flex-col sm:flex-row gap-8">
                   <CalendarMonth
                     year={calStart.year}
                     month={calStart.month}
@@ -562,6 +780,7 @@ export default function PropertyPage() {
                     showRightArrow={false}
                     onPrev={prevCal}
                     onNext={nextCal}
+                    dayStatuses={dayStatuses}
                   />
                   <CalendarMonth
                     year={calSecond.year}
@@ -570,6 +789,7 @@ export default function PropertyPage() {
                     showRightArrow={true}
                     onPrev={prevCal}
                     onNext={nextCal}
+                    dayStatuses={dayStatuses}
                   />
                 </div>
                 <div className="flex items-center gap-6 mt-5 text-[13px] text-[#8A7968]">
@@ -608,7 +828,7 @@ export default function PropertyPage() {
               {/* Things To Know */}
               <div className="border-b border-[#EDE8DF] pb-8 mb-8">
                 <h2 className="text-[22px] font-semibold text-[#1C1410] mb-6">Things To Know</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                   <div>
                     <h3 className="text-[14px] font-semibold text-[#1C1410] mb-3">Neighborhood Highlights</h3>
                     <p className="text-[13px] text-[#5A4A3A] leading-[1.75] mb-3">
@@ -673,6 +893,7 @@ export default function PropertyPage() {
                 guestyId={property.guestyId}
                 maxGuests={property.guests}
                 propertySlug={property.slug}
+                dayStatuses={dayStatuses}
               />
             </div>
           </div>

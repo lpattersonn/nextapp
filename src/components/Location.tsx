@@ -167,8 +167,8 @@ export default function Location() {
           <div className="bg-white rounded-2xl overflow-hidden shadow-sm p-8 flex gap-8 items-center">
             {/* Drive times */}
             <div className="space-y-6 shrink-0 w-[260px]">
-              {driveItems.map((item) => (
-                <div key={item.time} className="flex items-start gap-3">
+              {driveItems.map((item, idx) => (
+                <div key={idx} className="flex items-start gap-3">
                   <div className="flex-1">
                     <span className="font-semibold text-[#1C1410] text-[16px]">{item.time} </span>
                     <span className="text-[16px] text-[#8A7968]">{item.desc}</span>

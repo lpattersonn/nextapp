@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
-import { getPropertyBySlug } from "@/data/properties";
+import { getPropertyBySlug, type Property } from "@/data/properties";
+import { guestyFetch, type GuestyListingFull } from "@/lib/guesty";
 import CheckoutFlow from "@/components/CheckoutFlow";
 
 export default async function CheckoutPage({
@@ -15,17 +16,45 @@ export default async function CheckoutPage({
   const checkOut = typeof sp.checkOut === "string" ? sp.checkOut : "";
   const guestsRaw = typeof sp.guests === "string" ? parseInt(sp.guests, 10) : 0;
 
-  if (!slug || !listingId || !checkIn || !checkOut || guestsRaw < 1) {
+  if (!checkIn || !checkOut || guestsRaw < 1) {
     redirect("/stays");
   }
 
-  const property = getPropertyBySlug(slug);
+  // Try local property first, then fall back to a live Guesty fetch
+  let property: Property | null = getPropertyBySlug(slug) ?? null;
+
+  if (!property && /^[0-9a-f]{24}$/i.test(listingId)) {
+    try {
+      const listing = await guestyFetch<GuestyListingFull>(`/listings/${listingId}`);
+      property = {
+        slug: listingId,
+        guestyId: listingId,
+        name: listing.nickname || listing.title,
+        type: listing.propertyType ?? "Vacation Rental",
+        location: [listing.address?.city, listing.address?.state].filter(Boolean).join(", "),
+        address: listing.address?.full ?? "",
+        guests: listing.accommodates ?? 0,
+        beds: listing.bedrooms ?? 0,
+        baths: listing.bathrooms ?? 0,
+        price: String(listing.prices?.basePrice ?? 0),
+        images: (listing.pictures ?? []).slice(0, 8).map((p) => p.original),
+        description: "",
+        highlights: [],
+        amenities: [],
+        nearby: [],
+        houseRules: [],
+      };
+    } catch {
+      redirect("/stays");
+    }
+  }
+
   if (!property) redirect("/stays");
 
   return (
     <CheckoutFlow
       property={property}
-      listingId={listingId}
+      listingId={listingId || slug}
       checkIn={checkIn}
       checkOut={checkOut}
       guests={guestsRaw}

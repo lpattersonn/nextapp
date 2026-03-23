@@ -42,6 +42,7 @@ export const properties: Property[] = [
   // ─── PIONEERTOWN ─────────────────────────────────────────────────────────────
   {
     slug: "the-outlaw",
+    guestyId: "68e186e56cf6cf0011674201",
     name: "The Outlaw",
     badge: "Most Popular",
     type: "House",
@@ -135,6 +136,7 @@ Steps from Pioneertown's legendary Pappy & Harriet's and just 20 minutes from th
   },
   {
     slug: "heavens-door",
+    guestyId: "68e0af4cc98aea0012358333",
     name: "Heaven's Door",
     type: "House",
     location: "Pioneertown, California",
@@ -191,6 +193,7 @@ The full kitchen is stocked and ready for cooking, the EV charger keeps you powe
   },
   {
     slug: "moonlight-mile",
+    guestyId: "68e0b56f06627a00129155ab",
     name: "Moonlight Mile",
     type: "House",
     location: "Pioneertown, California",
@@ -250,6 +253,7 @@ The covered private patio and yoga mats make every morning feel like a retreat. 
   // ─── YUCCA VALLEY ────────────────────────────────────────────────────────────
   {
     slug: "whistling-rock",
+    guestyId: "68e192d99e441d001299f4a8",
     name: "Whistling Rock",
     badge: "Guest Favorite",
     type: "House",
@@ -305,6 +309,7 @@ Two master suites include indoor/outdoor access — wake up, step outside, and b
   },
   {
     slug: "the-artanis-villa",
+    guestyId: "68e09636d151410014a715aa",
     name: "The Artanis Villa",
     type: "House",
     location: "Yucca Valley, California",

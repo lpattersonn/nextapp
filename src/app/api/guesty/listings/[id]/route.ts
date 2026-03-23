@@ -14,12 +14,9 @@ export async function GET(
 
   try {
     const listing = await guestyFetch<GuestyListing>(
-      `/listings/${id}?fields=title,pictures`
+      `/listings/${id}`
     );
-    return NextResponse.json({
-      title: listing.title,
-      pictures: listing.pictures ?? [],
-    });
+    return NextResponse.json(listing);
   } catch (err) {
     console.error("[guesty/listings]", err);
     return NextResponse.json(

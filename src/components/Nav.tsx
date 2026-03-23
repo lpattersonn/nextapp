@@ -118,10 +118,10 @@ function StaysMegaMenu() {
                       key={p.slug}
                       href={`/property/${p.slug}`}
                       onClick={() => setOpen(false)}
-                      className="group relative rounded-xl overflow-hidden bg-[#2D1B0E] hover:ring-2 hover:ring-[#8D5F52] transition-all"
+                      className="group relative rounded-xl overflow-hidden bg-[#2D1B0E] hover:ring-2 hover:ring-[#8D5F52] transition-all min-h-[190px]"
                     >
-                      {/* Image */}
-                      <div className="relative h-[190px] w-full overflow-hidden">
+                      {/* Image fills full card */}
+                      <div className="absolute inset-0 overflow-hidden">
                         <Image
                           src={p.images[0]}
                           alt={p.name}
@@ -129,8 +129,7 @@ function StaysMegaMenu() {
                           className="object-cover group-hover:scale-105 transition-transform duration-500"
                           unoptimized
                         />
-                        {/* Bottom gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       </div>
                       {/* Text overlay */}
                       <div className="absolute bottom-0 left-0 right-0 p-4">
