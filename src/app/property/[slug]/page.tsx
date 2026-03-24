@@ -5,10 +5,36 @@ import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { properties, getPropertyBySlug, type Property } from "@/data/properties";
+import { properties, getPropertyBySlug, type Property, type AmenityGroup } from "@/data/properties";
 import type { GuestyQuote, GuestyListingFull } from "@/lib/guesty";
 
-function guestyToProperty(l: GuestyListingFull): Property {
+// ─── Guesty amenity grouping ──────────────────────────────────────────────────
+const AMENITY_CATS: { label: string; keys: string[] }[] = [
+  { label: "Essentials",         keys: ["wifi","internet","air condition","heating","washer","dryer","iron","parking","elevator","hangers","essentials","pack n play","crib","high chair"] },
+  { label: "Kitchen",            keys: ["kitchen","cook","coffee","dishwasher","refriger","microwave","oven","toaster","utensil","blender","stove","baking","freezer","dining","wine","kettle","ice maker","trash compactor"] },
+  { label: "Outdoor & Pool",     keys: ["bbq","grill","fire pit","fireplace","pool","hot tub","patio","deck","garden","hammock","outdoor","beach","kayak","sauna","cowboy tub","jacuzzi","terrace","balcony","fire place"] },
+  { label: "Entertainment",      keys: ["tv","cable","netflix","game","gym","exercise","ping pong","billiard","piano","sound system","streaming","speaker","bluetooth","arcade","foosball","board game","movie","books"] },
+  { label: "Bedroom & Laundry",  keys: ["bed linen","extra pillow","pillow","blackout","closet","wardrobe","mattress"] },
+  { label: "Bathroom",           keys: ["hair dryer","body soap","shampoo","conditioner","bathtub","towel","bidet","shower"] },
+  { label: "Safety",             keys: ["alarm","fire extinguisher","first aid","carbon monoxide","smoke","safety","detector","security","lock box"] },
+];
+
+function groupGuestyAmenities(flat: string[]): AmenityGroup[] {
+  const placed = new Set<string>();
+  const result: AmenityGroup[] = [];
+  for (const { label, keys } of AMENITY_CATS) {
+    const items = flat.filter(a => !placed.has(a) && keys.some(k => a.toLowerCase().includes(k)));
+    if (items.length) {
+      items.forEach(a => placed.add(a));
+      result.push({ category: label, icon: "", items });
+    }
+  }
+  const rest = flat.filter(a => !placed.has(a));
+  if (rest.length) result.push({ category: "Other", icon: "", items: rest });
+  return result;
+}
+
+function guestyToProperty(l: GuestyListingFull, overrides: Partial<Property> = {}): Property {
   return {
     slug: l._id,
     guestyId: l._id,
@@ -20,12 +46,34 @@ function guestyToProperty(l: GuestyListingFull): Property {
     beds: l.bedrooms ?? 0,
     baths: l.bathrooms ?? 0,
     price: l.prices?.basePrice ? String(l.prices.basePrice) : "0",
-    images: (l.pictures ?? []).slice(0, 12).map((p) => p.original),
-    description: "",
+    images: (l.pictures ?? [])
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+      .slice(0, 24)
+      .map((p) => p.original),
+    description: l.publicDescription?.summary ?? "",
     highlights: [],
-    amenities: [],
+    amenities: groupGuestyAmenities(l.amenities ?? []),
     nearby: [],
-    houseRules: [],
+    houseRules: l.publicDescription?.houseRules
+      ? l.publicDescription.houseRules.split("\n").map(s => s.trim()).filter(Boolean)
+      : [],
+    // PMS-enriched
+    checkInTime: l.defaultCheckInTime,
+    checkOutTime: l.defaultCheckOutTime,
+    minNights: l.terms?.minNights,
+    maxNights: l.terms?.maxNights,
+    cleaningFee: l.prices?.cleaningFee,
+    extraPersonFee: l.prices?.extraPersonFee,
+    lat: l.address?.lat,
+    lng: l.address?.lng,
+    squareFeet: l.areaSquareFeet,
+    fullAddress: l.address?.full,
+    descriptionFull: l.publicDescription?.space,
+    houseManual: l.houseManual,
+    wifiName: l.wifiName,
+    wifiPassword: l.wifiPassword,
+    parkingInstructions: l.parkingInstructions,
+    ...overrides,
   };
 }
 
@@ -104,6 +152,8 @@ function BookingWidget({
   guestyId,
   maxGuests,
   propertySlug,
+  cleaningFee,
+  minNights,
   dayStatuses = {},
 }: {
   price: string;
@@ -111,6 +161,8 @@ function BookingWidget({
   guestyId?: string;
   maxGuests?: number;
   propertySlug: string;
+  cleaningFee?: number;
+  minNights?: number;
   dayStatuses?: Record<string, "available" | "unavailable" | "booked" | "blocked">;
 }) {
   const router = useRouter();
@@ -135,7 +187,7 @@ function BookingWidget({
 
   const nightly = parseInt(price.replace(",", ""), 10);
   const estimatedSubtotal = nights * nightly;
-  const estimatedCleaning = Math.round(nightly * 0.12);
+  const estimatedCleaning = cleaningFee ?? Math.round(nightly * 0.12);
 
   useEffect(() => {
     setAvailStatus("idle");
@@ -587,18 +639,32 @@ export default function PropertyPage() {
   const [showMoreDesc, setShowMoreDesc] = useState(false);
   const [showAllAmenities, setShowAllAmenities] = useState(false);
 
-  // Fetch from Guesty if slug is a Guesty listing ID and not found locally
+  // Fetch full listing from Guesty for both cases:
+  //  1. Slug is a Guesty ID and no local prop → use Guesty as the data source
+  //  2. Local prop has a guestyId → enrich with live PMS data (description, amenities, images, prices)
   useEffect(() => {
-    if (localProp || !isGuestyId) return;
-    fetch(`/api/guesty/listings/${slug}`)
+    const gId = localProp?.guestyId ?? (isGuestyId ? slug : null);
+    if (!gId) return;
+
+    fetch(`/api/guesty/listings/${gId}`)
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data: GuestyListingFull) => {
-        const p = guestyToProperty(data);
-        setProperty(p);
-        setImages(p.images);
+        const enriched = guestyToProperty(data, localProp ? {
+          // Preserve manually-curated local fields
+          slug: localProp.slug,
+          badge: localProp.badge,
+          nearby: localProp.nearby,
+          guestyId: localProp.guestyId,
+        } : {});
+        setProperty(enriched);
+        setImages(enriched.images);
         setFetchingGuesty(false);
       })
-      .catch(() => setFetchingGuesty(false));
+      .catch(() => {
+        // Fall back gracefully — keep local data if it exists
+        if (localProp) setFetchingGuesty(false);
+        else setFetchingGuesty(false);
+      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
@@ -621,19 +687,6 @@ export default function PropertyPage() {
     year: m.month === 11 ? m.year + 1 : m.year,
     month: m.month === 11 ? 0 : m.month + 1,
   }));
-
-  // Fetch live images from Guesty PMS (skip if already loaded from Guesty fallback)
-  useEffect(() => {
-    if (!property?.guestyId || !localProp) return; // local props fetch images; Guesty-only already has them
-    fetch(`/api/guesty/listings/${property.guestyId}`)
-      .then(r => r.json())
-      .then(data => {
-        if (Array.isArray(data.pictures) && data.pictures.length > 0) {
-          setImages(data.pictures.map((p: { original: string }) => p.original));
-        }
-      })
-      .catch(() => {});
-  }, [property?.guestyId]);
 
   // Fetch 3-month availability calendar from Guesty whenever the displayed months change
   useEffect(() => {
@@ -722,6 +775,38 @@ export default function PropertyPage() {
                   <span>4.9</span>
                 </div>
               </div>
+
+              {/* Check-in info strip */}
+              {(property.checkInTime || property.checkOutTime || property.minNights || property.squareFeet) && (
+                <div className="border-b border-[#EDE8DF] pb-7 mb-7">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-5">
+                    {property.checkInTime && (
+                      <div>
+                        <p className="text-[11px] tracking-[0.12em] uppercase text-[#8A7968] mb-1">Check-in</p>
+                        <p className="text-[15px] font-medium text-[#1C1410]">{property.checkInTime}</p>
+                      </div>
+                    )}
+                    {property.checkOutTime && (
+                      <div>
+                        <p className="text-[11px] tracking-[0.12em] uppercase text-[#8A7968] mb-1">Check-out</p>
+                        <p className="text-[15px] font-medium text-[#1C1410]">{property.checkOutTime}</p>
+                      </div>
+                    )}
+                    {property.minNights && (
+                      <div>
+                        <p className="text-[11px] tracking-[0.12em] uppercase text-[#8A7968] mb-1">Min stay</p>
+                        <p className="text-[15px] font-medium text-[#1C1410]">{property.minNights} night{property.minNights !== 1 ? "s" : ""}</p>
+                      </div>
+                    )}
+                    {property.squareFeet && (
+                      <div>
+                        <p className="text-[11px] tracking-[0.12em] uppercase text-[#8A7968] mb-1">Size</p>
+                        <p className="text-[15px] font-medium text-[#1C1410]">{property.squareFeet.toLocaleString()} sq ft</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* About this place */}
               <div className="border-b border-[#EDE8DF] pb-8 mb-8">
@@ -913,6 +998,8 @@ export default function PropertyPage() {
                 guestyId={property.guestyId}
                 maxGuests={property.guests}
                 propertySlug={property.slug}
+                cleaningFee={property.cleaningFee}
+                minNights={property.minNights}
                 dayStatuses={dayStatuses}
               />
             </div>

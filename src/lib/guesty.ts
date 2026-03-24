@@ -36,6 +36,8 @@ declare global {
   var __guestyListings: { value: GuestyListingFull[]; expiresAt: number } | undefined;
   // eslint-disable-next-line no-var
   var __guestyListingsFlight: Promise<GuestyListingFull[]> | undefined;
+  // eslint-disable-next-line no-var
+  var __guestyListingById: Map<string, { value: GuestyListingFull; expiresAt: number }> | undefined;
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -277,19 +279,66 @@ export interface GuestyListingFull extends GuestyListing {
   accommodates: number;
   bedrooms?: number;
   bathrooms?: number;
+  beds?: number;
   propertyType?: string;
+  roomType?: string;
   active?: boolean;
+  isListed?: boolean;
+  isTest?: boolean;
+  areaSquareFeet?: number;
+  timezone?: string;
+  minimumAge?: number;
+  hostName?: string;
+  tags?: string[];
+  license?: string;
+  propertyLicenseNumber?: string;
+  createdAt?: string;
+  lastUpdatedAt?: string;
   address?: {
+    street?: string;
     city?: string;
     state?: string;
+    zipcode?: string;
     country?: string;
     full?: string;
+    lat?: number;
+    lng?: number;
   };
   prices?: {
     basePrice?: number;
     currency?: string;
-    weekendPrice?: number;
+    cleaningFee?: number;
+    extraPersonFee?: number;
+    securityDepositFee?: number | null;
+    weeklyPriceFactor?: number;
+    monthlyPriceFactor?: number;
+    guestsIncludedInRegularFee?: number;
+    weekendDays?: number[];
   };
+  terms?: {
+    minNights?: number;
+    maxNights?: number;
+  };
+  publicDescription?: {
+    summary?: string;
+    space?: string;
+    access?: string;
+    interactionWithGuests?: string;
+    neighborhood?: string;
+    transit?: string;
+    houseRules?: string;
+    notes?: string;
+  };
+  defaultCheckInTime?: string;
+  defaultCheckInEndTime?: string;
+  defaultCheckOutTime?: string;
+  amenities?: string[];
+  amenitiesNotIncluded?: string[];
+  houseManual?: string;
+  wifiName?: string;
+  wifiPassword?: string;
+  parkingInstructions?: string;
+  checkInInstructions?: string;
 }
 
 /** Normalized availability search result returned to the frontend */
@@ -559,7 +608,7 @@ export async function getAllListings(): Promise<GuestyListingFull[]> {
 
     while (true) {
       const data = await guestyFetch<{ results?: GuestyListingFull[] }>(
-        `/listings?limit=${limit}&skip=${skip}`
+        `/listings?limit=${limit}&skip=${skip}&fields=_id,title,nickname,accommodates,bedrooms,bathrooms,propertyType,active,isTest,address,prices,pictures`
       );
       const page = data.results ?? [];
       all.push(...page);
@@ -581,6 +630,23 @@ export async function getAllListings(): Promise<GuestyListingFull[]> {
   });
 
   return global.__guestyListingsFlight;
+}
+
+/**
+ * Fetch a single listing by Guesty ID with a 1-hour server-side cache.
+ * Uses globalThis so the cache survives Next.js hot-reloads in dev.
+ */
+export async function getListingById(id: string): Promise<GuestyListingFull> {
+  if (!global.__guestyListingById) global.__guestyListingById = new Map();
+  const cached = global.__guestyListingById.get(id);
+  if (cached && Date.now() < cached.expiresAt) return cached.value;
+
+  const listing = await guestyFetch<GuestyListingFull>(`/listings/${id}`);
+  global.__guestyListingById.set(id, {
+    value: listing,
+    expiresAt: Date.now() + 60 * 60 * 1000, // 1 hour
+  });
+  return listing;
 }
 
 /** Generate a URL-safe slug from a Guesty listing title/nickname. */

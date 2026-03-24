@@ -36,6 +36,22 @@ export interface Property {
   amenities: AmenityGroup[];
   nearby: NearbyItem[];
   houseRules: string[];
+  // PMS-enriched fields — populated from Guesty when available
+  checkInTime?: string;
+  checkOutTime?: string;
+  minNights?: number;
+  maxNights?: number;
+  cleaningFee?: number;
+  extraPersonFee?: number;
+  lat?: number;
+  lng?: number;
+  squareFeet?: number;
+  fullAddress?: string;
+  descriptionFull?: string;
+  houseManual?: string;
+  wifiName?: string;
+  wifiPassword?: string;
+  parkingInstructions?: string;
 }
 
 export const properties: Property[] = [

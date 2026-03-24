@@ -110,18 +110,88 @@ export default function Hero() {
 
         {/* ── Search bar ── */}
         <div className="w-full max-w-[760px] relative" ref={dropdownRef}>
+
+          {/* ── MOBILE: stacked card ── */}
           <div
-            className="flex items-stretch rounded-full overflow-hidden"
-            style={{
-              background: "rgba(255,255,255,0.97)",
-              boxShadow: "0 4px 32px rgba(0,0,0,0.30), 0 1px 4px rgba(0,0,0,0.20)",
-            }}
+            className="sm:hidden rounded-2xl overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.97)", boxShadow: "0 8px 40px rgba(0,0,0,0.35)" }}
+          >
+            {/* Location */}
+            <label className="flex items-center gap-3 px-5 py-4 border-b border-[#ede8e0] cursor-text">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Anywhere"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="flex-1 text-[15px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent"
+              />
+            </label>
+
+            {/* Dates */}
+            <button
+              type="button"
+              onClick={() => setDatesOpen((o) => !o)}
+              className={`w-full flex items-center gap-3 px-5 py-4 border-b text-left transition-colors ${
+                missingDates ? "border-[#c4773a]/40 bg-[#fff8f4]" : "border-[#ede8e0]"
+              }`}
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth="2" strokeLinecap="round" className="shrink-0">
+                <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+              <span className="flex-1 text-[15px]" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
+                {datesLabel}
+              </span>
+              {(checkIn || checkOut) && (
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9A8A7A" strokeWidth="2" strokeLinecap="round">
+                  <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              )}
+            </button>
+
+            {/* Guests */}
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-[#ede8e0]">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+              </svg>
+              <span className="flex-1 text-[15px] text-[#9A8A7A]">{guests} Guest{guests !== 1 ? "s" : ""}</span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setGuests((g) => Math.max(1, g - 1))}
+                  className="w-7 h-7 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[16px] leading-none active:bg-[#f0e8dc] cursor-pointer"
+                  aria-label="Fewer guests"
+                >−</button>
+                <span className="text-[15px] text-[#1C1410] tabular-nums w-4 text-center">{guests}</span>
+                <button
+                  type="button"
+                  onClick={() => setGuests((g) => Math.min(16, g + 1))}
+                  className="w-7 h-7 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[16px] leading-none active:bg-[#f0e8dc] cursor-pointer"
+                  aria-label="More guests"
+                >+</button>
+              </div>
+            </div>
+
+            {/* Search */}
+            <button
+              onClick={handleSearch}
+              className="w-full py-4 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#2D1B0E] active:bg-[#3D2B1E] transition-colors cursor-pointer"
+            >
+              Search
+            </button>
+          </div>
+
+          {/* ── DESKTOP: horizontal pill ── */}
+          <div
+            className="hidden sm:flex items-stretch rounded-full overflow-hidden"
+            style={{ background: "rgba(255,255,255,0.97)", boxShadow: "0 4px 32px rgba(0,0,0,0.30), 0 1px 4px rgba(0,0,0,0.20)" }}
           >
             {/* Anywhere */}
             <label className="flex items-center gap-2.5 px-6 py-4 flex-1 border-r border-[#ddd8d0] cursor-text min-w-0">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
               </svg>
               <input
                 type="text"
@@ -132,69 +202,43 @@ export default function Hero() {
               />
             </label>
 
-            {/* Anytime (date range button) */}
+            {/* Anytime */}
             <button
               type="button"
               onClick={() => setDatesOpen((o) => !o)}
-              className={`hidden sm:flex items-center gap-2.5 px-6 py-4 flex-1 border-r text-left transition-colors ${
-                missingDates
-                  ? "border-[#c4773a]/50 bg-[#fff8f4]"
-                  : "border-[#ddd8d0] hover:bg-[#faf7f4]"
+              className={`flex items-center gap-2.5 px-6 py-4 flex-1 border-r text-left transition-colors ${
+                missingDates ? "border-[#c4773a]/50 bg-[#fff8f4]" : "border-[#ddd8d0] hover:bg-[#faf7f4]"
               }`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <rect x="3" y="4" width="18" height="18" rx="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
+                <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
               </svg>
-              <span
-                className="text-[14px] truncate"
-                style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}
-              >
+              <span className="text-[14px] truncate" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
                 {datesLabel}
               </span>
             </button>
 
             {/* Guests */}
-            <div className="hidden sm:flex items-center gap-2 px-4 py-4 border-r border-[#ddd8d0]">
+            <div className="flex items-center gap-2 px-4 py-4 border-r border-[#ddd8d0]">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
               </svg>
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                  className="w-6 h-6 rounded-full border border-[#C4A882]/70 flex items-center justify-center text-[#7B5B3A] hover:bg-[#f0e8dc] transition-colors text-[15px] leading-none"
-                  aria-label="Fewer guests"
-                >
-                  −
-                </button>
+                <button type="button" onClick={() => setGuests((g) => Math.max(1, g - 1))} className="w-6 h-6 rounded-full border border-[#C4A882]/70 flex items-center justify-center text-[#7B5B3A] hover:bg-[#f0e8dc] transition-colors text-[15px] leading-none cursor-pointer" aria-label="Fewer guests">−</button>
                 <span className="text-[14px] text-[#1C1410] tabular-nums w-5 text-center">{guests}</span>
-                <button
-                  type="button"
-                  onClick={() => setGuests((g) => Math.min(16, g + 1))}
-                  className="w-6 h-6 rounded-full border border-[#C4A882]/70 flex items-center justify-center text-[#7B5B3A] hover:bg-[#f0e8dc] transition-colors text-[15px] leading-none"
-                  aria-label="More guests"
-                >
-                  +
-                </button>
+                <button type="button" onClick={() => setGuests((g) => Math.min(16, g + 1))} className="w-6 h-6 rounded-full border border-[#C4A882]/70 flex items-center justify-center text-[#7B5B3A] hover:bg-[#f0e8dc] transition-colors text-[15px] leading-none cursor-pointer" aria-label="More guests">+</button>
               </div>
             </div>
 
-            {/* Search button */}
-            <button
-              onClick={handleSearch}
-              className="px-8 py-4 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.15em] uppercase hover:bg-[#2D1B0E] transition-colors shrink-0 cursor-pointer"
-            >
+            {/* Search */}
+            <button onClick={handleSearch} className="px-8 py-4 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.15em] uppercase hover:bg-[#2D1B0E] transition-colors shrink-0 cursor-pointer">
               Search
             </button>
           </div>
 
           {/* Dates dropdown */}
           {datesOpen && (
-            <div className="absolute top-[calc(100%+10px)] left-1/4 right-0 bg-white rounded-2xl shadow-2xl border border-[#E8E0D5] p-6 z-50 min-w-[320px]">
+            <div className="absolute top-[calc(100%+8px)] left-0 right-0 sm:left-1/4 bg-white rounded-2xl shadow-2xl border border-[#E8E0D5] p-5 z-50">
               <p className="text-[11px] font-bold tracking-[0.12em] uppercase text-[#8A7968] mb-4">
                 {!checkIn ? "Select check-in date" : !checkOut ? "Now select check-out" : "Update dates"}
               </p>
@@ -205,10 +249,7 @@ export default function Hero() {
                     type="date"
                     min={today}
                     value={checkIn}
-                    onChange={(e) => {
-                      setCheckIn(e.target.value);
-                      if (checkOut && e.target.value >= checkOut) setCheckOut("");
-                    }}
+                    onChange={(e) => { setCheckIn(e.target.value); if (checkOut && e.target.value >= checkOut) setCheckOut(""); }}
                     className="w-full text-[14px] text-[#1C1410] border border-[#E0D8CE] rounded-lg px-3 py-2.5 outline-none focus:border-[#C4A882] cursor-pointer"
                   />
                 </div>
@@ -218,19 +259,13 @@ export default function Hero() {
                     type="date"
                     min={minOut}
                     value={checkOut}
-                    onChange={(e) => {
-                      setCheckOut(e.target.value);
-                      if (checkIn) setDatesOpen(false);
-                    }}
+                    onChange={(e) => { setCheckOut(e.target.value); if (checkIn) setDatesOpen(false); }}
                     className="w-full text-[14px] text-[#1C1410] border border-[#E0D8CE] rounded-lg px-3 py-2.5 outline-none focus:border-[#C4A882] cursor-pointer"
                   />
                 </div>
               </div>
               {checkIn && checkOut && (
-                <button
-                  onClick={() => { setCheckIn(""); setCheckOut(""); }}
-                  className="mt-3 text-[12px] text-[#8A7968] underline underline-offset-2 hover:text-[#1C1410] transition-colors"
-                >
+                <button onClick={() => { setCheckIn(""); setCheckOut(""); }} className="mt-3 text-[12px] text-[#8A7968] underline underline-offset-2 hover:text-[#1C1410] transition-colors">
                   Clear dates
                 </button>
               )}

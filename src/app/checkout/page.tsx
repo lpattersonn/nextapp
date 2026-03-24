@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getPropertyBySlug, type Property } from "@/data/properties";
-import { guestyFetch, type GuestyListingFull } from "@/lib/guesty";
+import { getListingById, type GuestyListingFull } from "@/lib/guesty";
 import CheckoutFlow from "@/components/CheckoutFlow";
 
 export default async function CheckoutPage({
@@ -25,7 +25,7 @@ export default async function CheckoutPage({
 
   if (!property && /^[0-9a-f]{24}$/i.test(listingId)) {
     try {
-      const listing = await guestyFetch<GuestyListingFull>(`/listings/${listingId}`);
+      const listing = await getListingById(listingId);
       property = {
         slug: listingId,
         guestyId: listingId,
