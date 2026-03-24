@@ -86,7 +86,11 @@ function guestyToProperty(l: GuestyListingFull, overrides: Partial<Property> = {
 }
 
 // ─── Photo Grid / Mobile Carousel ─────────────────────────────────────────────
-function PhotoGrid({ images, name }: { images: string[]; name: string }) {
+function PhotoGrid({ images, name, openRef }: {
+  images: string[];
+  name: string;
+  openRef?: React.MutableRefObject<((idx: number) => void) | null>;
+}) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIdx, setLightboxIdx] = useState(0);
   const [carouselIdx, setCarouselIdx] = useState(0);
@@ -96,6 +100,10 @@ function PhotoGrid({ images, name }: { images: string[]; name: string }) {
   const filled = [...side, ...Array(Math.max(0, 4 - side.length)).fill(images[0])];
 
   const open = (i: number) => { setLightboxIdx(i); setLightboxOpen(true); };
+
+  // Expose open() to the parent via ref so other sections can trigger the gallery
+  useEffect(() => { if (openRef) openRef.current = open; });
+
   const lbPrev = () => setLightboxIdx(i => (i - 1 + images.length) % images.length);
   const lbNext = () => setLightboxIdx(i => (i + 1) % images.length);
   const cPrev = () => setCarouselIdx(i => (i - 1 + images.length) % images.length);
@@ -729,6 +737,9 @@ export default function PropertyPage() {
   const [showDescModal, setShowDescModal] = useState(false);
   const [showAmenitiesModal, setShowAmenitiesModal] = useState(false);
 
+  // Ref to trigger PhotoGrid's lightbox from other sections (e.g. Quick Tour)
+  const photoGridOpenRef = useRef<((idx: number) => void) | null>(null);
+
   // Drag-to-scroll for Quick Tour strip
   const tourRef = useRef<HTMLDivElement>(null);
   const dragState = useRef({ active: false, startX: 0, scrollLeft: 0 });
@@ -866,7 +877,7 @@ export default function PropertyPage() {
       {/* Photo Grid — edge-to-edge on mobile, contained on desktop */}
       <div className="bg-[#FAF8F5]">
         <div className="sm:max-w-[1120px] sm:mx-auto sm:px-4 sm:pt-4">
-          <PhotoGrid images={images} name={property.name} />
+          <PhotoGrid images={images} name={property.name} openRef={photoGridOpenRef} />
         </div>
       </div>
 
@@ -976,7 +987,7 @@ export default function PropertyPage() {
                         <Image src={src} alt="" fill className="object-cover pointer-events-none" unoptimized draggable={false} />
                         {i === images.slice(1).length - 1 && (
                           <button
-                            onClick={() => { setLightboxIdx(0); setLightboxOpen(true); }}
+                            onClick={() => photoGridOpenRef.current?.(0)}
                             className="absolute bottom-3 right-3 bg-white/90 text-[#1C1410] text-[12px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow hover:bg-white transition cursor-pointer"
                           >
                             <LayoutGrid size={12} color="#1C1410" strokeWidth={2} />
