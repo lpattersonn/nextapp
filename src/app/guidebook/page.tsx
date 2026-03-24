@@ -185,7 +185,7 @@ export default function GuidebookPage() {
                         {item.desc}
                       </p>
                     </div>
-                    <div className="relative w-[68px] h-[68px] rounded-xl overflow-hidden shrink-0 bg-[#EDE8DF]">
+                    <div className="relative w-[110px] h-[80px] rounded-xl overflow-hidden shrink-0 bg-[#EDE8DF]">
                       <Image
                         src={item.img}
                         alt={item.title}

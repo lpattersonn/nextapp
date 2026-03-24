@@ -7,6 +7,8 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { properties, getPropertyBySlug, type Property, type AmenityGroup } from "@/data/properties";
 import type { GuestyQuote, GuestyListingFull } from "@/lib/guesty";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faBed, faBath, faStar, faCircleCheck, faWifi, faUtensils, faTree, faTv, faShirt, faDroplet, faShield } from "@fortawesome/free-solid-svg-icons";
 
 // ─── Guesty amenity grouping ──────────────────────────────────────────────────
 const AMENITY_CATS: { label: string; keys: string[] }[] = [
@@ -761,18 +763,26 @@ export default function PropertyPage() {
                   {property.name}
                 </h1>
                 <p className="text-[15px] text-[#5A4A3A] mb-4">{property.type} in {property.location}</p>
-                <div className="flex items-center gap-2.5 text-[15px] text-[#5A4A3A] flex-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                  <span>{property.guests}</span>
+                <div className="flex items-center gap-3 text-[15px] text-[#5A4A3A] flex-wrap">
+                  <span className="flex items-center gap-1.5">
+                    <FontAwesomeIcon icon={faUser} className="w-[15px] h-[15px] text-[#7B5B3A]" />
+                    <span>{property.guests} guests</span>
+                  </span>
                   <span className="text-[#D0C8BD]">·</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M2 9V19H22V9"/><path d="M6 9V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg>
-                  <span>{property.beds}</span>
+                  <span className="flex items-center gap-1.5">
+                    <FontAwesomeIcon icon={faBed} className="w-[16px] h-[16px] text-[#7B5B3A]" />
+                    <span>{property.beds} beds</span>
+                  </span>
                   <span className="text-[#D0C8BD]">·</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9 6V3.5a2.5 2.5 0 0 1 5 0V6"/><rect x="2" y="6" width="20" height="10" rx="2"/><path d="M6 16v2M18 16v2"/></svg>
-                  <span>{property.baths}</span>
+                  <span className="flex items-center gap-1.5">
+                    <FontAwesomeIcon icon={faBath} className="w-[15px] h-[15px] text-[#7B5B3A]" />
+                    <span>{property.baths} baths</span>
+                  </span>
                   <span className="text-[#D0C8BD]">·</span>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  <span>4.9</span>
+                  <span className="flex items-center gap-1.5">
+                    <FontAwesomeIcon icon={faStar} className="w-[13px] h-[13px] text-[#FFB800]" />
+                    <span>4.9</span>
+                  </span>
                 </div>
               </div>
 
@@ -855,9 +865,7 @@ export default function PropertyPage() {
                 <div className="grid grid-cols-2 gap-x-6 gap-y-3 mb-5">
                   {visibleAmenities.map(item => (
                     <div key={item} className="flex items-center gap-3 text-[14px] text-[#5A4A3A]">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="1.8" strokeLinecap="round" className="shrink-0">
-                        <circle cx="12" cy="12" r="10"/>
-                      </svg>
+                      <FontAwesomeIcon icon={faCircleCheck} className="w-[16px] h-[16px] text-[#7B5B3A] shrink-0" />
                       {item}
                     </div>
                   ))}

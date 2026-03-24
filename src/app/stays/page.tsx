@@ -5,6 +5,8 @@ import Image from "next/image";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import type { GuestyListingFull } from "@/lib/guesty";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUser, faBed, faBath } from "@fortawesome/free-solid-svg-icons";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
 function StayCard({ listing }: { listing: GuestyListingFull }) {
@@ -72,25 +74,25 @@ function StayCard({ listing }: { listing: GuestyListingFull }) {
             Starting at <span className="font-semibold text-[#1C1410]">${price.toLocaleString()}</span> / night
           </p>
         ) : null}
-        <p className="text-[13px] text-[#8A7968] flex items-center gap-2 flex-wrap">
+        <p className="text-[14px] text-[#8A7968] flex items-center gap-3 flex-wrap mt-1">
           {city && <span>{city}</span>}
-          {city && (listing.accommodates || listing.bedrooms) && <span className="text-[#D0C8BD]">|</span>}
+          {city && (listing.accommodates || listing.bedrooms) && <span className="text-[#D0C8BD]">·</span>}
           {listing.accommodates ? (
-            <span className="flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              {listing.accommodates}
+            <span className="flex items-center gap-1.5">
+              <FontAwesomeIcon icon={faUser} className="w-[13px] h-[13px] text-[#7B5B3A]" />
+              <span>{listing.accommodates}</span>
             </span>
           ) : null}
           {listing.bedrooms ? (
-            <span className="flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M2 9V19H22V9"/><path d="M6 9V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/></svg>
-              {listing.bedrooms}
+            <span className="flex items-center gap-1.5">
+              <FontAwesomeIcon icon={faBed} className="w-[14px] h-[14px] text-[#7B5B3A]" />
+              <span>{listing.bedrooms}</span>
             </span>
           ) : null}
           {listing.bathrooms ? (
-            <span className="flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 6V3.5a2.5 2.5 0 0 1 5 0V6"/><rect x="2" y="6" width="20" height="10" rx="2"/></svg>
-              {listing.bathrooms}
+            <span className="flex items-center gap-1.5">
+              <FontAwesomeIcon icon={faBath} className="w-[13px] h-[13px] text-[#7B5B3A]" />
+              <span>{listing.bathrooms}</span>
             </span>
           ) : null}
         </p>

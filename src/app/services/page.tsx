@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
 const BASE = "https://thecohostcompany.com/wp-content/uploads";
 const G = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto";
@@ -111,7 +113,7 @@ export default function ServicesPage() {
                   <ul className="grid grid-cols-2 gap-2 mb-8">
                     {svc.features.map((f) => (
                       <li key={f} className="flex items-center gap-2 text-[14px] text-[#5A4A3A]">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4A882" strokeWidth="2.5" strokeLinecap="round"><path d="M5 13l4 4L19 7"/></svg>
+                        <FontAwesomeIcon icon={faCircleCheck} className="w-[15px] h-[15px] text-[#C4A882] shrink-0" />
                         {f}
                       </li>
                     ))}

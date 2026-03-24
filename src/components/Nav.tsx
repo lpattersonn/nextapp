@@ -187,8 +187,8 @@ const otherNavItems = [
     href: "/guidebook",
     dropdown: [
       { label: "Guidebook", href: "/guidebook" },
-      { label: "Virtual Concierge", href: "/guidebook" },
-      { label: "Local Favorites", href: "/#location" },
+      { label: "Virtual Concierge", href: "/concierge" },
+      { label: "Local Favorites", href: "/local-favorites" },
     ],
   },
   {
