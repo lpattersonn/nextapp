@@ -166,7 +166,7 @@ export default function PressPage() {
       <Nav />
 
       {/* ── HERO ── */}
-      <section className="relative h-[360px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[360px] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image
             src={`${G}/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg`}

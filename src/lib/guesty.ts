@@ -594,9 +594,15 @@ export async function createReservation(
   };
 }
 
+/** Clear the in-memory listings cache — useful after forced refresh. */
+export function clearListingsCache() {
+  global.__guestyListings = undefined;
+  global.__guestyListingsFlight = undefined;
+}
+
 /**
- * Fetch every active listing in the Guesty account (handles pagination).
- * Results are cached on globalThis for 10 minutes to avoid hammering the API.
+ * Fetch every active listed listing in the Guesty account (handles pagination).
+ * Results are cached on globalThis for 1 hour.
  * Concurrent calls join the in-flight request instead of issuing duplicates.
  */
 export async function getAllListings(): Promise<GuestyListingFull[]> {
@@ -616,44 +622,54 @@ export async function getAllListings(): Promise<GuestyListingFull[]> {
     let skip = 0;
     const limit = 100;
 
+    // Use top-level parent field names — dot-notation sub-fields are NOT
+    // supported by the Guesty Open API v1 fields filter and will be silently
+    // ignored, causing address / pictures / prices to come back empty.
+    const fields = [
+      "_id", "title", "nickname",
+      "accommodates", "bedrooms", "bathrooms", "propertyType",
+      "active", "isListed",
+      "address",   // returns the full address object (city, lat, lng, …)
+      "prices",    // returns the full prices object (basePrice, …)
+      "pictures",  // returns the full pictures array (original, thumbnail, …)
+      "tags",      // property tags (e.g. "Pool", "Boulders", "Luxury", …)
+    ].join(" ");
+
     while (true) {
-      const fields = [
-        "_id",
-        "title",
-        "nickname",
-        "accommodates",
-        "bedrooms",
-        "bathrooms",
-        "propertyType",
-        "active",
-        "isListed",
-        "isTest",
-        "address.city",
-        "address.state",
-        "address.country",
-        "address.full",
-        "address.lat",
-        "address.lng",
-        "prices.basePrice",
-        "prices.currency",
-        "prices.cleaningFee",
-        "pictures._id",
-        "pictures.original",
-        "pictures.thumbnail",
-        "pictures.sortOrder",
-      ].join(" ");
-      const data = await guestyFetch<{ results?: GuestyListingFull[] }>(
+      const raw = await guestyFetch<unknown>(
         `/listings?limit=${limit}&skip=${skip}&fields=${encodeURIComponent(fields)}`
       );
-      const page = data.results ?? [];
+
+      // Guesty may return { results:[…] }, { data:[…] }, or a plain array
+      let page: GuestyListingFull[];
+      if (Array.isArray(raw)) {
+        page = raw as GuestyListingFull[];
+      } else if (raw && typeof raw === "object" && "results" in raw && Array.isArray((raw as { results: unknown }).results)) {
+        page = (raw as { results: GuestyListingFull[] }).results;
+      } else if (raw && typeof raw === "object" && "data" in raw && Array.isArray((raw as { data: unknown }).data)) {
+        page = (raw as { data: GuestyListingFull[] }).data;
+      } else {
+        console.warn("[guesty/getAllListings] Unexpected response shape:", JSON.stringify(raw).slice(0, 300));
+        page = [];
+      }
+
+      if (skip === 0) {
+        const sample = page[0];
+        console.log(
+          `[guesty] Page 1: ${page.length} listings.`,
+          sample ? `First: id=${sample._id} title="${sample.title}" pictures=${sample.pictures?.length ?? 0} city=${sample.address?.city ?? "–"}` : "empty"
+        );
+      }
+
       all.push(...page);
       if (page.length < limit) break;
       skip += limit;
     }
 
-    const active = all.filter((l) => l.active !== false);
+    // Only serve active, publicly listed properties
+    const active = all.filter((l) => l.active !== false && l.isListed !== false);
+    console.log(`[guesty] getAllListings: ${all.length} total → ${active.length} active+listed`);
 
-    // Cache for 1 hour — listings/images are synced from Guesty once per hour
     global.__guestyListings = { value: active, expiresAt: Date.now() + 60 * 60 * 1000 };
     global.__guestyListingsFlight = undefined;
     return active;

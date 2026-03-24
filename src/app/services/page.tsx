@@ -281,7 +281,7 @@ export default function ServicesPage() {
             {marketingFeatures.slice(3).map((f) => (
               <div key={f.title} className="flex gap-3">
                 <div className="w-5 h-5 rounded-full bg-[#EDE8DF] flex items-center justify-center shrink-0 mt-0.5">
-                  <FontAwesomeIcon icon={faCircleCheck} className="w-[10px] h-[10px] text-[#7B5B3A]" />
+                  <CircleCheck size={10} color="#7B5B3A" strokeWidth={2} />
                 </div>
                 <div>
                   <p className="font-semibold text-[#1C1410] text-[14px] mb-0.5">{f.title}</p>
@@ -434,8 +434,8 @@ export default function ServicesPage() {
       </section>
 
       {/* ── PORTFOLIO STRIP ── */}
-      <section className="py-10 bg-[#F7F4EF] overflow-x-auto">
-        <div className="flex gap-3 min-w-max px-6">
+      <section className="py-10 bg-[#F7F4EF]">
+        <div className="flex gap-3 flex-wrap justify-center px-6">
           {portfolioProperties.map((p) => (
             <div key={p.name} className="relative w-[200px] h-[140px] rounded-xl overflow-hidden shrink-0 group">
               <Image

@@ -32,7 +32,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${playfair.variable} ${inter.variable}`}>
+      <body className={`${playfair.variable} ${inter.variable}`} suppressHydrationWarning>
         {children}
         {/* Elfsight widgets — single script load for entire site */}
         <Script src="https://elfsightcdn.com/platform.js" strategy="lazyOnload" />

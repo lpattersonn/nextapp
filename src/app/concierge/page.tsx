@@ -124,7 +124,7 @@ export default function ConciergePage() {
       <Nav />
 
       {/* ── HERO ── */}
-      <section className="relative h-[500px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-[500px] flex items-center justify-center overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image
             src={`${BASE}/2025/10/NEW-ABOUT-PHOTO-.webp`}

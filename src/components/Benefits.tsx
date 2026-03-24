@@ -23,7 +23,7 @@ const benefits = [
 
 export default function Benefits() {
   return (
-    <section id="services" className="relative py-28 overflow-hidden">
+    <section id="services" className="relative py-16 sm:py-24 overflow-hidden">
       {/* Dark background image */}
       <div className="absolute inset-0">
         <Image

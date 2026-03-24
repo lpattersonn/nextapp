@@ -116,7 +116,7 @@ export default function GuidebookPage() {
       <Nav />
 
       {/* ── HERO ── */}
-      <section className="relative flex items-center justify-center overflow-hidden" style={{ minHeight: 320 }}>
+      <section className="relative flex items-center justify-center overflow-hidden pt-20" style={{ minHeight: 320 }}>
         <div className="absolute inset-0">
           <Image
             src={`${BASE}/2025/05/Joshua-Tree-National-Park-.webp`}

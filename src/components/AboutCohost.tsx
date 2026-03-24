@@ -6,7 +6,7 @@ const BASE = "https://thecohostcompany.com/wp-content/uploads";
 
 export default function AboutCohost() {
   return (
-    <section id="about" className="py-28 bg-[#F7F4EF]">
+    <section id="about" className="py-16 sm:py-24 bg-[#F7F4EF]">
       <div className="max-w-[1120px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
         {/* Left: Text */}
         <div>

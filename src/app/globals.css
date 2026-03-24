@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+/* Hide scrollbars while keeping scroll functionality */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* Quick Tour strip: 1 full-width square on mobile, 2 per row (4:3) on sm+ */
+.tour-card {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  width: calc(100vw - 64px);
+  aspect-ratio: 1 / 1;
+}
+@media (min-width: 640px) {
+  .tour-card {
+    width: calc(50% - 6px);
+    aspect-ratio: 4 / 3;
+  }
+}
+
 @theme inline {
   --font-playfair: var(--font-playfair);
   --font-inter: var(--font-inter);

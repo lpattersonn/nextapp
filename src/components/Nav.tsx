@@ -300,7 +300,7 @@ export default function Nav() {
         {/* Book Now */}
         <div className="hidden md:block shrink-0">
           <Link
-            href="/stays"
+            href="/search"
             className="px-6 py-2.5 rounded-full bg-[#8D5F52] text-white text-[16px] font-semibold tracking-wide hover:bg-[#7B4F43] transition-colors"
           >
             Book Now

@@ -168,7 +168,7 @@ export default function StaysPage() {
       <Nav />
 
       {/* Hero */}
-      <section className="relative h-[320px] flex items-end overflow-hidden">
+      <section className="relative h-[320px] flex items-end overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image
             src="https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg"
@@ -250,8 +250,8 @@ export default function StaysPage() {
                     <div key={g}>
                       <div className="h-7 w-40 bg-[#E8E2DA] rounded animate-pulse mb-2" />
                       <div className="h-4 w-24 bg-[#E8E2DA] rounded animate-pulse mb-6" />
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3].map((i) => <CardSkeleton key={i} />)}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        {[1, 2].map((i) => <CardSkeleton key={i} />)}
                       </div>
                     </div>
                   ))
@@ -276,7 +276,7 @@ export default function StaysPage() {
                         </div>
 
                         {/* Grid */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                           {cityListings.map((listing) => (
                             <StayCard key={listing._id} listing={listing} />
                           ))}

@@ -4,8 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGlobe, faPhone, faLocationDot } from "@fortawesome/free-solid-svg-icons";
+import { Globe, Phone, MapPin } from "lucide-react";
 
 const BASE = "https://thecohostcompany.com/wp-content/uploads";
 const G = "https://assets.guesty.com/image/upload/w_800,q_auto,f_auto";
@@ -337,19 +336,19 @@ function PlaceCard({
               rel="noopener noreferrer"
               className="flex items-start gap-2 text-[12px] text-[#7B5B3A] hover:text-[#1C1410] transition-colors"
             >
-              <FontAwesomeIcon icon={faGlobe} className="w-[11px] h-[11px] mt-[2px] shrink-0" />
+              <Globe size={11} color="#7B5B3A" strokeWidth={2} className="mt-[2px] shrink-0" />
               <span className="truncate">{website}</span>
             </a>
           )}
           {phone && (
             <div className="flex items-start gap-2 text-[12px] text-[#5A4A3A]">
-              <FontAwesomeIcon icon={faPhone} className="w-[11px] h-[11px] mt-[2px] shrink-0 text-[#7B5B3A]" />
+              <Phone size={11} color="#7B5B3A" strokeWidth={2} className="mt-[2px] shrink-0" />
               <span>{phone}</span>
             </div>
           )}
           {address && (
             <div className="flex items-start gap-2 text-[12px] text-[#5A4A3A]">
-              <FontAwesomeIcon icon={faLocationDot} className="w-[11px] h-[11px] mt-[2px] shrink-0 text-[#7B5B3A]" />
+              <MapPin size={11} color="#7B5B3A" strokeWidth={2} className="mt-[2px] shrink-0" />
               <span className="leading-snug">{address}</span>
             </div>
           )}
@@ -399,7 +398,7 @@ export default function LocalFavoritesPage() {
       <Nav />
 
       {/* ── HERO ── */}
-      <section className="relative flex items-center justify-center overflow-hidden" style={{ minHeight: 360 }}>
+      <section className="relative flex items-center justify-center overflow-hidden pt-20" style={{ minHeight: 360 }}>
         <div className="absolute inset-0">
           <Image
             src={`${BASE}/2025/05/Joshua-Tree-National-Park-.webp`}

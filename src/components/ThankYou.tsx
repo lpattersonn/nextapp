@@ -62,7 +62,7 @@ export default function ThankYou() {
         </div>
 
         {/* Team photo carousel */}
-        <div className="relative h-[520px] rounded-[4px] overflow-hidden group">
+        <div className="relative h-[520px] rounded-[16px] overflow-hidden group">
           <Image
             key={current}
             src={teamPhotos[current].src}

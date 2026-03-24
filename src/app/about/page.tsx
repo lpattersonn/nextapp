@@ -27,7 +27,7 @@ export default function AboutPage() {
       <Nav />
 
       {/* Hero */}
-      <section className="relative h-[480px] flex items-center overflow-hidden">
+      <section className="relative h-[480px] flex items-center overflow-hidden pt-20">
         <div className="absolute inset-0">
           <Image
             src={`${BASE}/2025/10/NEW-ABOUT-PHOTO-.webp`}

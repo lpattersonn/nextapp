@@ -52,7 +52,7 @@ export default function ContactPage() {
       <Nav />
 
       {/* ── HERO ── */}
-      <section className="relative flex items-center justify-center" style={{ minHeight: 300 }}>
+      <section className="relative flex items-center justify-center pt-20" style={{ minHeight: 300 }}>
         <div className="absolute inset-0">
           <Image
             src={`${G}/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg`}

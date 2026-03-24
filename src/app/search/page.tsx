@@ -8,21 +8,14 @@ import Nav from "@/components/Nav";
 import type { GuestyListingFull } from "@/lib/guesty";
 import {
   MapPin, CalendarDays, Users, ChevronLeft, ChevronRight,
-  SlidersHorizontal, Search, RotateCcw, Star, BedDouble, Bath, ImageOff,
+  SlidersHorizontal, Search, RotateCcw, BedDouble, Bath, ImageOff,
 } from "lucide-react";
 
 // Leaflet map — dynamic import (no SSR) because Leaflet requires window
 const PropertyMap = dynamic(() => import("./PropertyMap"), { ssr: false });
 
-// ── Category filters ──────────────────────────────────────────────────────────
-const CATEGORIES = [
-  { label: "Featured",         keywords: [] },
-  { label: "Romantic Retreat", keywords: ["romantic", "retreat", "couple"] },
-  { label: "Pool",             keywords: ["pool", "swim"] },
-  { label: "Boulders",        keywords: ["boulder", "rock"] },
-  { label: "Unique",           keywords: ["unique", "dome", "container", "cave"] },
-  { label: "Luxury",           keywords: ["luxury", "villa", "estate"] },
-];
+// ── Category filters — pills are derived dynamically from listing tags ─────────
+// "Featured" is always first (no tag filter = show all)
 
 // ── Sort options ──────────────────────────────────────────────────────────────
 type SortKey = "featured" | "price_asc" | "price_desc" | "guests_desc";
@@ -80,14 +73,13 @@ function StayCard({
   return (
     <Link
       href={`/property/${listing._id}`}
-      className={`block bg-white rounded-2xl overflow-hidden transition-all duration-200 ${highlighted ? "shadow-2xl ring-2 ring-[#7B5B3A]" : "shadow-sm hover:shadow-lg"}`}
+      className={`block bg-white rounded-2xl overflow-hidden transition-all duration-300 ${highlighted ? "shadow-2xl ring-2 ring-[#7B5B3A]" : "shadow-sm hover:shadow-xl"}`}
       onMouseEnter={() => onHover(listing._id)}
       onMouseLeave={() => onHover(null)}
     >
-      {/* Image */}
-      <div className="relative h-[240px] group overflow-hidden bg-[#EDE8DF]">
+      <div className="relative h-[220px] group overflow-hidden bg-[#EDE8DF]">
         {images.length > 0 ? (
-          <Image src={images[current]} alt={name} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" unoptimized />
+          <Image src={images[current]} alt={name} fill className="object-cover transition-opacity duration-300" unoptimized />
         ) : (
           <div className="w-full h-full bg-[#D4C9BC] flex items-center justify-center">
             <ImageOff size={32} color="#9A8A7A" strokeWidth={1.5} />
@@ -105,40 +97,32 @@ function StayCard({
           </>
         )}
 
-        {/* Dot indicators */}
         <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
           {images.slice(0, 5).map((_, i) => (
             <button key={i} onClick={(e) => { e.preventDefault(); setCurrent(i); }}
-              className={`rounded-full transition-all cursor-pointer ${i === current ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/60"}`} />
+              className={`rounded-full transition-all duration-200 cursor-pointer ${i === current ? "w-2 h-2 bg-white" : "w-1.5 h-1.5 bg-white/55"}`} />
           ))}
-        </div>
-
-        {/* Rating */}
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 z-10">
-          <Star size={10} fill="#C4A882" color="#C4A882" strokeWidth={0} />
-          <span className="text-[11px] font-semibold text-[#1C1410]">4.9</span>
         </div>
       </div>
 
-      {/* Card body */}
       <div className="px-5 py-4">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h4 className="font-[family-name:var(--font-playfair)] text-[18px] font-normal text-[#1C1410] leading-snug">
-            {name}
-          </h4>
-        </div>
+        <h4 className="font-[family-name:var(--font-playfair)] text-[19px] font-normal text-[#1C1410] mb-1 leading-snug">{name}</h4>
         {price ? (
-          <p className="text-[14px] text-[#5A4A3A] mb-2">
-            Starting at <span className="font-semibold text-[#1C1410]">${price.toLocaleString()}</span>
+          <p className="text-[15px] text-[#5A4A3A] mb-2">
+            Starting at <span className="font-semibold text-[#1C1410]">${price.toLocaleString()}</span> / night
           </p>
         ) : null}
-        <div className="flex items-center gap-1.5 text-[13px] text-[#8A7968]">
-          <span>{listing.propertyType ?? "House"} in {cityKey(listing)}</span>
-          <span className="text-[#D0C8BD] mx-1">|</span>
-          {listing.accommodates && <span className="flex items-center gap-1"><Users size={12} color="#7B5B3A" strokeWidth={2} />{listing.accommodates}</span>}
-          {listing.bedrooms && <span className="flex items-center gap-1 ml-1"><BedDouble size={12} color="#7B5B3A" strokeWidth={2} />{listing.bedrooms}</span>}
-          {listing.bathrooms && <span className="flex items-center gap-1 ml-1"><Bath size={12} color="#7B5B3A" strokeWidth={2} />{listing.bathrooms}</span>}
-        </div>
+        <p className="text-[14px] text-[#8A7968] flex items-center gap-3 flex-wrap mt-1">
+          {listing.accommodates ? (
+            <span className="flex items-center gap-1.5"><Users size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" /><span>{listing.accommodates}</span></span>
+          ) : null}
+          {listing.bedrooms ? (
+            <span className="flex items-center gap-1.5"><BedDouble size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0" /><span>{listing.bedrooms}</span></span>
+          ) : null}
+          {listing.bathrooms ? (
+            <span className="flex items-center gap-1.5"><Bath size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" /><span>{listing.bathrooms}</span></span>
+          ) : null}
+        </p>
       </div>
     </Link>
   );
@@ -170,6 +154,7 @@ function SearchPageInner() {
   const [loading, setLoading]     = useState(true);
   const [category, setCategory]   = useState("Featured");
   const [sort, setSort]           = useState<SortKey>("featured");
+  const [tagPills, setTagPills]   = useState<string[]>(["Featured"]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const today  = new Date().toISOString().split("T")[0];
@@ -190,11 +175,23 @@ function SearchPageInner() {
     return () => document.removeEventListener("mousedown", h);
   }, []);
 
-  // Fetch listings
+  // Fetch listings + derive tag pills
   useEffect(() => {
     fetch("/api/guesty/listings")
       .then((r) => r.ok ? r.json() : Promise.reject())
-      .then((data) => { setListings(data.listings ?? []); setLoading(false); })
+      .then((data) => {
+        const raw: GuestyListingFull[] = data.listings ?? [];
+        setListings(raw);
+        // Collect unique tags across all listings, sorted alphabetically
+        const seen = new Set<string>();
+        for (const l of raw) {
+          for (const t of (l.tags ?? [])) {
+            if (t) seen.add(t);
+          }
+        }
+        setTagPills(["Featured", ...Array.from(seen).sort()]);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -215,13 +212,9 @@ function SearchPageInner() {
     // Guest filter
     if (guests > 1) result = result.filter((l) => (l.accommodates ?? 0) >= guests);
 
-    // Category filter
-    const cat = CATEGORIES.find((c) => c.label === category);
-    if (cat && cat.keywords.length > 0) {
-      result = result.filter((l) => {
-        const text = [l.nickname, l.title, ...(l.amenities ?? [])].join(" ").toLowerCase();
-        return cat.keywords.some((k) => text.includes(k));
-      });
+    // Category filter — match against Guesty listing tags
+    if (category !== "Featured") {
+      result = result.filter((l) => (l.tags ?? []).includes(category));
     }
 
     return sortListings(result, sort);
@@ -324,19 +317,19 @@ function SearchPageInner() {
           </button>
         </div>
 
-        {/* Category pills */}
+        {/* Category pills — derived from real Guesty listing tags */}
         <div className="max-w-[1400px] mx-auto flex items-center gap-3 mt-3 overflow-x-auto pb-1 scrollbar-hide">
-          {CATEGORIES.map((cat) => (
+          {tagPills.map((tag) => (
             <button
-              key={cat.label}
-              onClick={() => setCategory(cat.label)}
+              key={tag}
+              onClick={() => setCategory(tag)}
               className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all cursor-pointer shrink-0 ${
-                category === cat.label
+                category === tag
                   ? "bg-[#1C1410] text-white"
                   : "bg-[#F7F4EF] text-[#5A4A3A] hover:bg-[#EDE8DF]"
               }`}
             >
-              {cat.label}
+              {tag}
             </button>
           ))}
         </div>

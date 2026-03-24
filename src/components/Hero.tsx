@@ -5,6 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MapPin, CalendarDays, Users, X } from "lucide-react";
 
+function normalizeCity(raw: string): string {
+  if (/pioneer/i.test(raw)) return "Pioneertown";
+  if (/yucca/i.test(raw)) return "Yucca Valley";
+  if (/joshua/i.test(raw)) return "Joshua Tree";
+  if (/twentynine|29 palms/i.test(raw)) return "Twentynine Palms";
+  if (/morongo/i.test(raw)) return "Morongo Valley";
+  return raw.trim();
+}
+
 const pressLogos = [
   { name: "Logo-01", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-01.svg", cls: "h-8 w-36" },
   { name: "Logo-02", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-02.svg", cls: "h-8 w-44" },
@@ -26,8 +35,24 @@ export default function Hero() {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
   const [datesOpen, setDatesOpen] = useState(false);
-  const [missingDates, setMissingDates] = useState(false);
+  const [locationOptions, setLocationOptions] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Pull real listing locations from the API
+  useEffect(() => {
+    fetch("/api/guesty/listings")
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        const seen = new Set<string>();
+        const cities: string[] = [];
+        for (const l of (data?.listings ?? [])) {
+          const c = normalizeCity(l.address?.city ?? "");
+          if (c && !seen.has(c)) { seen.add(c); cities.push(c); }
+        }
+        if (cities.length) setLocationOptions(cities.sort());
+      })
+      .catch(() => {});
+  }, []);
 
   const today = new Date().toISOString().split("T")[0];
   const minOut = checkIn
@@ -53,21 +78,17 @@ export default function Hero() {
   }, []);
 
   function handleSearch() {
-    if (!checkIn || !checkOut) {
-      setMissingDates(true);
-      setDatesOpen(true);
-      setTimeout(() => setMissingDates(false), 2500);
-      return;
-    }
     const params = new URLSearchParams({
-      checkIn, checkOut, guests: String(guests),
+      guests: String(guests),
       ...(location ? { location } : {}),
+      ...(checkIn ? { checkIn } : {}),
+      ...(checkOut ? { checkOut } : {}),
     });
     router.push(`/search?${params}`);
   }
 
   return (
-    <section className="relative h-screen min-h-[680px] overflow-hidden flex flex-col">
+    <section className="relative h-[100svh] min-h-[680px] overflow-hidden flex flex-col">
       {/* Background video */}
       <div className="absolute inset-0">
         <video
@@ -84,6 +105,9 @@ export default function Hero() {
 
       {/* Overlay */}
       <div className="absolute inset-0 z-[1]" style={{ background: "#000000", opacity: 0.48 }} />
+
+      {/* Spacer = nav height (80px) so flex-1 content centers within the visible viewport */}
+      <div className="relative z-10 h-20 shrink-0" />
 
       {/* Center content */}
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-5 text-center">
@@ -107,7 +131,7 @@ export default function Hero() {
 
         {/* Subtitle */}
         <p className="text-white/85 text-[16px] leading-[1.8] mb-10 max-w-[500px] drop-shadow">
-          Thoughtfully managed, beautifully designed vacation rentals in
+          Thoughtfully managed, beautifully designed vacation rentals in{" "}
           <br className="hidden sm:block" />
           Pioneertown, Joshua Tree, Yucca Valley &amp; beyond
         </p>
@@ -136,22 +160,24 @@ export default function Hero() {
                 <input
                   type="text"
                   placeholder="Anywhere"
+                  list="hero-locations-mobile"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="flex-1 text-[15px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent"
                 />
+                <datalist id="hero-locations-mobile">
+                  {locationOptions.map((loc) => <option key={loc} value={loc} />)}
+                </datalist>
               </label>
 
               {/* Dates */}
               <button
                 type="button"
                 onClick={() => setDatesOpen((o) => !o)}
-                className={`w-full flex items-center gap-3 px-5 py-4 border-b text-left transition-colors ${
-                  missingDates ? "border-orange-300 bg-orange-50" : "border-[#EDE8DF]"
-                }`}
+                className="w-full flex items-center gap-3 px-5 py-4 border-b border-[#EDE8DF] text-left transition-colors"
               >
-                <CalendarDays size={15} color={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth={2} className="shrink-0 opacity-80" />
-                <span className="flex-1 text-[15px]" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
+                <CalendarDays size={15} color="#7B5B3A" strokeWidth={2} className="shrink-0 opacity-80" />
+                <span className="flex-1 text-[15px]" style={{ color: checkIn || checkOut ? "#1C1410" : "#9A8A7A" }}>
                   {datesLabel}
                 </span>
                 {(checkIn || checkOut) && (
@@ -211,22 +237,24 @@ export default function Hero() {
                 <input
                   type="text"
                   placeholder="Anywhere"
+                  list="hero-locations-desktop"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   className="w-full text-[14px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent min-w-0"
                 />
+                <datalist id="hero-locations-desktop">
+                  {locationOptions.map((loc) => <option key={loc} value={loc} />)}
+                </datalist>
               </label>
 
               {/* Anytime */}
               <button
                 type="button"
                 onClick={() => setDatesOpen((o) => !o)}
-                className={`flex items-center gap-2.5 px-6 py-3.5 flex-1 text-left transition-colors rounded-none ${
-                  missingDates ? "bg-orange-50" : "hover:bg-[#FAF8F5]"
-                }`}
+                className="flex items-center gap-2.5 px-6 py-3.5 flex-1 text-left transition-colors rounded-none hover:bg-[#FAF8F5]"
               >
-                <CalendarDays size={14} color={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth={2} className="shrink-0 opacity-80" />
-                <span className="text-[14px] truncate" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
+                <CalendarDays size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0 opacity-80" />
+                <span className="text-[14px] truncate" style={{ color: checkIn || checkOut ? "#1C1410" : "#9A8A7A" }}>
                   {datesLabel}
                 </span>
               </button>
@@ -288,9 +316,6 @@ export default function Hero() {
           )}
         </div>
 
-        {missingDates && (
-          <p className="mt-3 text-white/80 text-[13px]">Please select your check-in and check-out dates</p>
-        )}
       </div>
 
       {/* Press logos */}

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
@@ -202,6 +202,8 @@ function BookingWidget({
   cleaningFee,
   minNights,
   dayStatuses = {},
+  externalCheckIn = "",
+  externalCheckOut = "",
 }: {
   price: string;
   name: string;
@@ -211,10 +213,18 @@ function BookingWidget({
   cleaningFee?: number;
   minNights?: number;
   dayStatuses?: Record<string, "available" | "unavailable" | "booked" | "blocked">;
+  externalCheckIn?: string;
+  externalCheckOut?: string;
 }) {
   const router = useRouter();
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
+
+  // Sync dates selected on the page calendar to this widget
+  useEffect(() => {
+    if (externalCheckIn) { setCheckIn(externalCheckIn); }
+    if (externalCheckOut) { setCheckOut(externalCheckOut); }
+  }, [externalCheckIn, externalCheckOut]);
   const [guests, setGuests] = useState(1);
   const [availStatus, setAvailStatus] = useState<AvailStatus>("idle");
   const [quote, setQuote] = useState<GuestyQuote | null>(null);
@@ -585,7 +595,8 @@ function CalendarMonth({
           const isCheckIn = key === checkIn;
           const isCheckOut = key === checkOut;
           const isInRange = !!(checkIn && rangeEnd && key > checkIn && key < rangeEnd);
-          const isClickable = !isPast && isAvail && !loading;
+          // Allow clicking any non-past, non-booked day — even if status unknown (API may still be loading)
+          const isClickable = !isPast && !isBooked && !loading;
 
           let bg = "";
           let textColor = "";
@@ -604,7 +615,8 @@ function CalendarMonth({
           } else if (isAvail) {
             bg = "bg-[#e8f5ec]"; textColor = "text-[#1C1410]"; extra = "hover:bg-[#b8dcc0] transition-colors";
           } else {
-            bg = "bg-[#f5f3f0]"; textColor = "text-[#BFBBB6]";
+            // No status yet (calendar data loading/unavailable) — show as neutral clickable
+            bg = "bg-[#f5f3f0]"; textColor = "text-[#5A4A3A]"; extra = "hover:bg-[#EDE8DF] transition-colors";
           }
 
           return (
@@ -633,7 +645,8 @@ function PropertyCard({ p }: { p: Property }) {
   const [imgIdx, setImgIdx] = useState(0);
   return (
     <Link href={`/property/${p.slug}`} className="group block">
-      <div className="relative h-[220px] rounded-2xl overflow-hidden mb-3 bg-[#EDE8DF]">
+      {/* Image */}
+      <div className="relative h-[300px] rounded-2xl overflow-hidden mb-4 bg-[#EDE8DF]">
         <Image
           src={p.images[imgIdx]}
           alt={p.name}
@@ -642,7 +655,7 @@ function PropertyCard({ p }: { p: Property }) {
           unoptimized
         />
         {p.badge && (
-          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[11px] font-semibold tracking-[0.06em] uppercase px-3 py-1 rounded-full shadow-sm z-10">
+          <span className="absolute top-3 left-3 bg-white/90 text-[#1C1410] text-[11px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
             {p.badge}
           </span>
         )}
@@ -650,42 +663,54 @@ function PropertyCard({ p }: { p: Property }) {
           <>
             <button
               onClick={e => { e.preventDefault(); setImgIdx(i => (i - 1 + p.images.length) % p.images.length); }}
-              className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center text-[#1C1410] opacity-0 group-hover:opacity-100 transition-opacity shadow cursor-pointer z-10"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/85 hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md cursor-pointer z-10"
             >
-              <ChevronLeft size={15} color="#1C1410" strokeWidth={2.5} />
+              <ChevronLeft size={16} color="#1C1410" strokeWidth={2.5} />
             </button>
             <button
               onClick={e => { e.preventDefault(); setImgIdx(i => (i + 1) % p.images.length); }}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white flex items-center justify-center text-[#1C1410] opacity-0 group-hover:opacity-100 transition-opacity shadow cursor-pointer z-10"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/85 hover:bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md cursor-pointer z-10"
             >
-              <ChevronRight size={15} color="#1C1410" strokeWidth={2.5} />
+              <ChevronRight size={16} color="#1C1410" strokeWidth={2.5} />
             </button>
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
               {p.images.slice(0, 5).map((_, i) => (
                 <button
                   key={i}
                   onClick={e => { e.preventDefault(); setImgIdx(i); }}
-                  className={`rounded-full transition-all cursor-pointer ${i === imgIdx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/60"}`}
+                  className={`rounded-full transition-all cursor-pointer ${i === imgIdx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/55"}`}
                 />
               ))}
             </div>
           </>
         )}
       </div>
+
+      {/* Info */}
       <div>
-        <div className="flex items-start justify-between mb-0.5">
-          <h3 className="font-[family-name:var(--font-playfair)] text-[17px] font-normal text-[#1C1410]">{p.name}</h3>
-          <div className="flex items-center gap-1 text-[13px] text-[#1C1410] font-medium shrink-0 ml-2">
-            <Star size={11} fill="#C4A882" color="#C4A882" strokeWidth={0} />
-            4.9
-          </div>
-        </div>
-        <p className="text-[13px] text-[#8A7968] mb-1">{p.type} in {p.location.split(",")[0]}</p>
-        <p className="text-[14px] text-[#1C1410]">
-          Starting at <span className="font-semibold">${p.price}</span>
-          <span className="text-[#8A7968]"> / night</span>
+        <h3 className="font-[family-name:var(--font-playfair)] text-[22px] font-normal text-[#1C1410] mb-1 leading-snug">
+          {p.name}
+        </h3>
+        <p className="text-[14px] text-[#5A4A3A] mb-2">
+          Starting at <span className="font-semibold text-[#1C1410]">${p.price}</span>
+          <span className="text-[#8A7968]"> night</span>
         </p>
-        <p className="text-[13px] text-[#8A7968]">{p.guests} guests · {p.beds} beds · {p.baths} baths</p>
+        <div className="flex items-center gap-2 text-[13px] text-[#8A7968] flex-wrap">
+          <span>{p.type} in {p.location.split(",")[0]}</span>
+          <span className="text-[#D0C8BD]">|</span>
+          <span className="flex items-center gap-1">
+            <Users size={12} color="#7B5B3A" strokeWidth={2} />
+            {p.guests}
+          </span>
+          <span className="flex items-center gap-1">
+            <BedDouble size={13} color="#7B5B3A" strokeWidth={2} />
+            {p.beds}
+          </span>
+          <span className="flex items-center gap-1">
+            <Bath size={12} color="#7B5B3A" strokeWidth={2} />
+            {p.baths}
+          </span>
+        </div>
       </div>
     </Link>
   );
@@ -703,6 +728,26 @@ export default function PropertyPage() {
   const [images, setImages] = useState<string[]>(localProp?.images ?? []);
   const [showDescModal, setShowDescModal] = useState(false);
   const [showAmenitiesModal, setShowAmenitiesModal] = useState(false);
+
+  // Drag-to-scroll for Quick Tour strip
+  const tourRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef({ active: false, startX: 0, scrollLeft: 0 });
+  function onTourMouseDown(e: React.MouseEvent) {
+    const el = tourRef.current; if (!el) return;
+    e.preventDefault();
+    dragState.current = { active: true, startX: e.clientX, scrollLeft: el.scrollLeft };
+    el.style.cursor = "grabbing";
+  }
+  function onTourMouseMove(e: React.MouseEvent) {
+    if (!dragState.current.active) return;
+    const el = tourRef.current; if (!el) return;
+    const dx = e.clientX - dragState.current.startX;
+    el.scrollLeft = dragState.current.scrollLeft - dx;
+  }
+  function onTourMouseUp() {
+    dragState.current.active = false;
+    if (tourRef.current) tourRef.current.style.cursor = "grab";
+  }
 
   // Fetch full listing from Guesty for both cases:
   //  1. Slug is a Guesty ID and no local prop → use Guesty as the data source
@@ -805,7 +850,9 @@ export default function PropertyPage() {
 
   if (!property) return notFound();
 
-  const allProperties = properties.filter(p => p.slug !== property.slug).slice(0, 3);
+  const allProperties = properties.filter(p =>
+    p.slug !== property.slug && (!property.guestyId || p.guestyId !== property.guestyId)
+  ).slice(0, 3);
   const allAmenities = property.amenities.flatMap(g => g.items);
   const visibleAmenities = allAmenities.slice(0, 10);
   const descParagraphs = property.description ? property.description.split("\n\n") : [];
@@ -909,23 +956,35 @@ export default function PropertyPage() {
               </div>
 
               {/* Quick Tour */}
-              {images.length >= 3 && (
+              {images.length >= 2 && (
                 <div className="border-b border-[#EDE8DF] pb-8 mb-8">
                   <h2 className="text-[22px] font-semibold text-[#1C1410] mb-4">Quick Tour</h2>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#EDE8DF]">
-                      <Image src={images[1]} alt="" fill className="object-cover" unoptimized />
-                    </div>
-                    <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#EDE8DF]">
-                      <Image src={images[2]} alt="" fill className="object-cover" unoptimized />
-                      <button
-                        onClick={() => {}}
-                        className="absolute bottom-3 right-3 bg-white/90 text-[#1C1410] text-[12px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow hover:bg-white transition cursor-pointer"
+                  <div
+                    ref={tourRef}
+                    className="flex gap-3 overflow-x-auto -mx-1 px-1 select-none no-scrollbar"
+                    style={{ scrollSnapType: "x mandatory", cursor: "grab", touchAction: "pan-x" }}
+                    onMouseDown={onTourMouseDown}
+                    onMouseMove={onTourMouseMove}
+                    onMouseUp={onTourMouseUp}
+                    onMouseLeave={onTourMouseUp}
+                  >
+                    {images.slice(1).map((src, i) => (
+                      <div
+                        key={i}
+                        className="tour-card relative rounded-xl overflow-hidden bg-[#EDE8DF]"
                       >
-                        <LayoutGrid size={12} color="#1C1410" strokeWidth={2} />
-                        Gallery
-                      </button>
-                    </div>
+                        <Image src={src} alt="" fill className="object-cover pointer-events-none" unoptimized draggable={false} />
+                        {i === images.slice(1).length - 1 && (
+                          <button
+                            onClick={() => { setLightboxIdx(0); setLightboxOpen(true); }}
+                            className="absolute bottom-3 right-3 bg-white/90 text-[#1C1410] text-[12px] font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow hover:bg-white transition cursor-pointer"
+                          >
+                            <LayoutGrid size={12} color="#1C1410" strokeWidth={2} />
+                            Gallery
+                          </button>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
@@ -1129,22 +1188,27 @@ export default function PropertyPage() {
                 cleaningFee={property.cleaningFee}
                 minNights={property.minNights}
                 dayStatuses={dayStatuses}
+                externalCheckIn={calCheckIn}
+                externalCheckOut={calCheckOut}
               />
             </div>
           </div>
 
           {/* You May Also Like */}
           {allProperties.length > 0 && (
-            <div className="mt-16 pt-12 border-t border-[#EDE8DF]">
+            <div className="mt-16 pt-12 pb-20 border-t border-[#EDE8DF]">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="font-[family-name:var(--font-playfair)] text-[32px] font-normal text-[#1C1410]">
                   You May Also Like
                 </h2>
-                <Link href="/stays" className="text-[14px] text-[#7B5B3A] font-medium hover:underline">
+                <Link
+                  href="/stays"
+                  className="text-[13px] font-medium text-[#1C1410] border border-[#D0C8BD] px-5 py-2.5 rounded-full hover:bg-[#F7F4EF] transition-colors whitespace-nowrap"
+                >
                   View All Listings →
                 </Link>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {allProperties.map(p => (
                   <PropertyCard key={p.slug} p={p} />
                 ))}
@@ -1171,11 +1235,11 @@ export default function PropertyPage() {
       {/* ── Description Modal ── */}
       {showDescModal && (
         <div
-          className="fixed inset-0 z-[200] bg-black/40 flex items-end sm:items-center justify-center"
+          className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center px-4"
           onClick={() => setShowDescModal(false)}
         >
           <div
-            className="bg-white w-full sm:max-w-[620px] sm:mx-4 sm:rounded-2xl rounded-t-2xl max-h-[90vh] flex flex-col shadow-2xl"
+            className="bg-white w-full max-w-[620px] rounded-[16px] max-h-[90vh] flex flex-col shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
@@ -1206,11 +1270,11 @@ export default function PropertyPage() {
       {/* ── Amenities Modal ── */}
       {showAmenitiesModal && (
         <div
-          className="fixed inset-0 z-[200] bg-black/40 flex items-end sm:items-center justify-center"
+          className="fixed inset-0 z-[200] bg-black/40 flex items-center justify-center px-4"
           onClick={() => setShowAmenitiesModal(false)}
         >
           <div
-            className="bg-white w-full sm:max-w-[620px] sm:mx-4 sm:rounded-2xl rounded-t-2xl max-h-[90vh] flex flex-col shadow-2xl"
+            className="bg-white w-full max-w-[620px] rounded-[16px] max-h-[90vh] flex flex-col shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             {/* Header */}
@@ -1239,7 +1303,7 @@ export default function PropertyPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {group.items.map(item => (
                         <div key={item} className="flex items-center gap-3 text-[14px] text-[#5A4A3A]">
-                          <FontAwesomeIcon icon={faCircleCheck} className="w-[16px] h-[16px] text-[#7B5B3A] shrink-0" />
+                          <CircleCheck size={16} color="#7B5B3A" strokeWidth={1.75} className="shrink-0" />
                           {item}
                         </div>
                       ))}
