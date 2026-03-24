@@ -46,16 +46,22 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    // 1. Get a fresh price quote
-    const quote = await guestyFetch<GuestyQuote>("/reservations/quotes", {
-      method: "POST",
-      body: JSON.stringify({
-        checkInDateLocalized: checkIn,
-        checkOutDateLocalized: checkOut,
-        listingId,
-        numberOfGuests: guests,
-      }),
-    });
+    // 1. Attempt price quote — optional, not all Guesty plans expose this endpoint
+    let quoteId: string | undefined;
+    try {
+      const quote = await guestyFetch<GuestyQuote>("/reservations/quotes", {
+        method: "POST",
+        body: JSON.stringify({
+          checkInDateLocalized: checkIn,
+          checkOutDateLocalized: checkOut,
+          listingId,
+          numberOfGuests: guests,
+        }),
+      });
+      quoteId = quote._id;
+    } catch {
+      console.warn("[guesty/book] Quote step skipped — proceeding without quoteId");
+    }
 
     // 2. Create (or find) the guest record
     const guest = await guestyFetch<GuestyGuest>("/guests", {
@@ -75,9 +81,9 @@ export async function POST(req: NextRequest) {
         checkInDateLocalized: checkIn,
         checkOutDateLocalized: checkOut,
         listingId,
-        numberOfGuests: guests,
+        numberOfGuests: { numberOfAdults: guests },
         guestId: guest._id,
-        quoteId: quote._id,
+        ...(quoteId ? { quoteId } : {}),
         source: "direct",
         ...(specialRequests ? { notes: specialRequests } : {}),
       }),

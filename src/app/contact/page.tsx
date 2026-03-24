@@ -3,16 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
+import { MessageCircle, Phone, Sparkles, Users } from "lucide-react";
 
 const G = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto";
 
 const guestCards = [
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-    ),
+    Icon: MessageCircle,
     title: "Chat with Support!",
     desc: "We're here to help.",
     cta: "reservations@thecohostcompany.com",
@@ -20,11 +17,7 @@ const guestCards = [
     ctaLabel: null,
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.82 12 19.79 19.79 0 0 1 1.78 3.41 2 2 0 0 1 3.77 1.24h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.96a16 16 0 0 0 6.29 6.29l1.28-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/>
-      </svg>
-    ),
+    Icon: Phone,
     title: "Call Us",
     desc: "24/7 customer support",
     cta: "+1 (760) 624-8481",
@@ -32,11 +25,7 @@ const guestCards = [
     ctaLabel: null,
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
-      </svg>
-    ),
+    Icon: Sparkles,
     title: "Virtual Concierge",
     desc: "Get the full experience of Joshua Tree with our popular add-ons and activities.",
     cta: null,
@@ -44,11 +33,7 @@ const guestCards = [
     ctaLabel: "Send Request",
   },
   {
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="1.6" strokeLinecap="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-    ),
+    Icon: Users,
     title: "Join Our Community",
     desc: "Get early access to new stays and exclusive offers.",
     cta: null,
@@ -129,7 +114,7 @@ export default function ContactPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {guestCards.map((card) => (
                 <div key={card.title} className="bg-[#FAFAF9] border border-[#EDE8DF] rounded-xl p-6">
-                  <div className="mb-4">{card.icon}</div>
+                  <div className="mb-4"><card.Icon size={24} color="#7B5B3A" strokeWidth={1.6} /></div>
                   <h3 className="font-semibold text-[#1C1410] text-[15px] mb-1">{card.title}</h3>
                   <p className="text-[13px] text-[#8A7968] leading-[1.7] mb-3">{card.desc}</p>
                   {card.cta && (

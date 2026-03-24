@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { MapPin, CalendarDays, Users, X } from "lucide-react";
 
 const pressLogos = [
   { name: "Logo-01", src: "https://thecohostcompany.com/wp-content/uploads/2025/05/Logo-01.svg", cls: "h-8 w-36" },
@@ -58,8 +59,11 @@ export default function Hero() {
       setTimeout(() => setMissingDates(false), 2500);
       return;
     }
-    const params = new URLSearchParams({ checkIn, checkOut, guests: String(guests) });
-    router.push(`/stays?${params}`);
+    const params = new URLSearchParams({
+      checkIn, checkOut, guests: String(guests),
+      ...(location ? { location } : {}),
+    });
+    router.push(`/search?${params}`);
   }
 
   return (
@@ -112,128 +116,139 @@ export default function Hero() {
         <div className="w-full max-w-[760px] relative" ref={dropdownRef}>
 
           {/* ── MOBILE: stacked card ── */}
+          {/* Outer: dark glass wrapper */}
           <div
-            className="sm:hidden rounded-2xl overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.97)", boxShadow: "0 8px 40px rgba(0,0,0,0.35)" }}
+            className="sm:hidden"
+            style={{
+              padding: "8px",
+              borderRadius: "20px",
+              background: "rgba(0, 0, 0, 0.10)",
+              boxShadow: "0px 4px 8px 0px rgba(0, 0, 0, 0.28), 0px 0px 2px 0px rgba(0, 0, 0, 0.48)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
           >
-            {/* Location */}
-            <label className="flex items-center gap-3 px-5 py-4 border-b border-[#ede8e0] cursor-text">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Anywhere"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="flex-1 text-[15px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent"
-              />
-            </label>
+            {/* Inner: solid white form */}
+            <div className="rounded-xl overflow-hidden bg-white">
+              {/* Location */}
+              <label className="flex items-center gap-3 px-5 py-4 border-b border-[#EDE8DF] cursor-text">
+                <MapPin size={15} color="#7B5B3A" strokeWidth={2} className="shrink-0 opacity-80" />
+                <input
+                  type="text"
+                  placeholder="Anywhere"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="flex-1 text-[15px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent"
+                />
+              </label>
 
-            {/* Dates */}
-            <button
-              type="button"
-              onClick={() => setDatesOpen((o) => !o)}
-              className={`w-full flex items-center gap-3 px-5 py-4 border-b text-left transition-colors ${
-                missingDates ? "border-[#c4773a]/40 bg-[#fff8f4]" : "border-[#ede8e0]"
-              }`}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              <span className="flex-1 text-[15px]" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
-                {datesLabel}
-              </span>
-              {(checkIn || checkOut) && (
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9A8A7A" strokeWidth="2" strokeLinecap="round">
-                  <path d="M18 6L6 18M6 6l12 12" />
-                </svg>
-              )}
-            </button>
+              {/* Dates */}
+              <button
+                type="button"
+                onClick={() => setDatesOpen((o) => !o)}
+                className={`w-full flex items-center gap-3 px-5 py-4 border-b text-left transition-colors ${
+                  missingDates ? "border-orange-300 bg-orange-50" : "border-[#EDE8DF]"
+                }`}
+              >
+                <CalendarDays size={15} color={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth={2} className="shrink-0 opacity-80" />
+                <span className="flex-1 text-[15px]" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
+                  {datesLabel}
+                </span>
+                {(checkIn || checkOut) && (
+                  <X size={12} color="#9A8A7A" strokeWidth={2} />
+                )}
+              </button>
 
-            {/* Guests */}
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-[#ede8e0]">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-              </svg>
-              <span className="flex-1 text-[15px] text-[#9A8A7A]">{guests} Guest{guests !== 1 ? "s" : ""}</span>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                  className="w-7 h-7 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[16px] leading-none active:bg-[#f0e8dc] cursor-pointer"
-                  aria-label="Fewer guests"
-                >−</button>
-                <span className="text-[15px] text-[#1C1410] tabular-nums w-4 text-center">{guests}</span>
-                <button
-                  type="button"
-                  onClick={() => setGuests((g) => Math.min(16, g + 1))}
-                  className="w-7 h-7 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[16px] leading-none active:bg-[#f0e8dc] cursor-pointer"
-                  aria-label="More guests"
-                >+</button>
+              {/* Guests */}
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-[#EDE8DF]">
+                <Users size={15} color="#7B5B3A" strokeWidth={2} className="shrink-0 opacity-80" />
+                <span className="flex-1 text-[15px] text-[#5A4A3A]">{guests} Guest{guests !== 1 ? "s" : ""}</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setGuests((g) => Math.max(1, g - 1))}
+                    className="w-7 h-7 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[16px] leading-none hover:bg-[#F7F4EF] cursor-pointer"
+                    aria-label="Fewer guests"
+                  >−</button>
+                  <span className="text-[15px] text-[#1C1410] tabular-nums w-4 text-center">{guests}</span>
+                  <button
+                    type="button"
+                    onClick={() => setGuests((g) => Math.min(16, g + 1))}
+                    className="w-7 h-7 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[16px] leading-none hover:bg-[#F7F4EF] cursor-pointer"
+                    aria-label="More guests"
+                  >+</button>
+                </div>
               </div>
-            </div>
 
-            {/* Search */}
-            <button
-              onClick={handleSearch}
-              className="w-full py-4 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#2D1B0E] active:bg-[#3D2B1E] transition-colors cursor-pointer"
-            >
-              Search
-            </button>
+              {/* Search */}
+              <button
+                onClick={handleSearch}
+                className="w-full py-4 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.2em] uppercase hover:bg-[#2D1B0E] active:bg-[#3D2B1E] transition-colors cursor-pointer"
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           {/* ── DESKTOP: horizontal pill ── */}
+          {/* Outer: dark glass ring */}
           <div
-            className="hidden sm:flex items-stretch rounded-full overflow-hidden"
-            style={{ background: "rgba(255,255,255,0.97)", boxShadow: "0 4px 32px rgba(0,0,0,0.30), 0 1px 4px rgba(0,0,0,0.20)" }}
+            className="hidden sm:block"
+            style={{
+              padding: "8px",
+              borderRadius: "100px",
+              background: "rgba(0, 0, 0, 0.10)",
+              boxShadow: "0px 4px 8px 0px rgba(0, 0, 0, 0.28), 0px 0px 2px 0px rgba(0, 0, 0, 0.48)",
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+            }}
           >
-            {/* Anywhere */}
-            <label className="flex items-center gap-2.5 px-6 py-4 flex-1 border-r border-[#ddd8d0] cursor-text min-w-0">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Anywhere"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="w-full text-[14px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent min-w-0"
-              />
-            </label>
+            {/* Inner: solid white/brand form */}
+            <div className="flex items-stretch rounded-full bg-white">
+              {/* Anywhere */}
+              <label className="flex items-center gap-2.5 px-6 py-3.5 flex-1 cursor-text min-w-0">
+                <MapPin size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0 opacity-80" />
+                <input
+                  type="text"
+                  placeholder="Anywhere"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full text-[14px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent min-w-0"
+                />
+              </label>
 
-            {/* Anytime */}
-            <button
-              type="button"
-              onClick={() => setDatesOpen((o) => !o)}
-              className={`flex items-center gap-2.5 px-6 py-4 flex-1 border-r text-left transition-colors ${
-                missingDates ? "border-[#c4773a]/50 bg-[#fff8f4]" : "border-[#ddd8d0] hover:bg-[#faf7f4]"
-              }`}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              <span className="text-[14px] truncate" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
-                {datesLabel}
-              </span>
-            </button>
+              {/* Anytime */}
+              <button
+                type="button"
+                onClick={() => setDatesOpen((o) => !o)}
+                className={`flex items-center gap-2.5 px-6 py-3.5 flex-1 text-left transition-colors rounded-none ${
+                  missingDates ? "bg-orange-50" : "hover:bg-[#FAF8F5]"
+                }`}
+              >
+                <CalendarDays size={14} color={missingDates ? "#c4773a" : "#7B5B3A"} strokeWidth={2} className="shrink-0 opacity-80" />
+                <span className="text-[14px] truncate" style={{ color: checkIn || checkOut ? "#1C1410" : missingDates ? "#c4773a" : "#9A8A7A" }}>
+                  {datesLabel}
+                </span>
+              </button>
 
-            {/* Guests */}
-            <div className="flex items-center gap-2 px-4 py-4 border-r border-[#ddd8d0]">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7B5B3A" strokeWidth="2" strokeLinecap="round" className="shrink-0">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-              </svg>
-              <div className="flex items-center gap-2">
-                <button type="button" onClick={() => setGuests((g) => Math.max(1, g - 1))} className="w-6 h-6 rounded-full border border-[#C4A882]/70 flex items-center justify-center text-[#7B5B3A] hover:bg-[#f0e8dc] transition-colors text-[15px] leading-none cursor-pointer" aria-label="Fewer guests">−</button>
-                <span className="text-[14px] text-[#1C1410] tabular-nums w-5 text-center">{guests}</span>
-                <button type="button" onClick={() => setGuests((g) => Math.min(16, g + 1))} className="w-6 h-6 rounded-full border border-[#C4A882]/70 flex items-center justify-center text-[#7B5B3A] hover:bg-[#f0e8dc] transition-colors text-[15px] leading-none cursor-pointer" aria-label="More guests">+</button>
+              {/* Guests */}
+              <div className="flex items-center gap-2 px-5 py-3.5">
+                <Users size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0 opacity-80" />
+                <div className="flex items-center gap-2">
+                  <button type="button" onClick={() => setGuests((g) => Math.max(1, g - 1))} className="w-5 h-5 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] hover:bg-[#F7F4EF] transition-colors text-[14px] leading-none cursor-pointer" aria-label="Fewer guests">−</button>
+                  <span className="text-[14px] text-[#1C1410] tabular-nums w-4 text-center">{guests}</span>
+                  <button type="button" onClick={() => setGuests((g) => Math.min(16, g + 1))} className="w-5 h-5 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] hover:bg-[#F7F4EF] transition-colors text-[14px] leading-none cursor-pointer" aria-label="More guests">+</button>
+                </div>
               </div>
-            </div>
 
-            {/* Search */}
-            <button onClick={handleSearch} className="px-8 py-4 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.15em] uppercase hover:bg-[#2D1B0E] transition-colors shrink-0 cursor-pointer">
-              Search
-            </button>
+              {/* Search */}
+              <button
+                onClick={handleSearch}
+                className="m-1 px-7 bg-[#1C1410] text-white text-[12px] font-bold tracking-[0.15em] uppercase rounded-full hover:bg-[#3D2B1E] transition-colors shrink-0 cursor-pointer"
+              >
+                Search
+              </button>
+            </div>
           </div>
 
           {/* Dates dropdown */}

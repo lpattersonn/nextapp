@@ -2,8 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import { CircleCheck } from "lucide-react";
 
 const BASE = "https://thecohostcompany.com/wp-content/uploads";
 const G = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto";
@@ -201,7 +200,7 @@ export default function ServicesPage() {
                   <ul className="grid grid-cols-2 gap-y-1.5 gap-x-4 mb-4">
                     {svc.items.map((item) => (
                       <li key={item} className="flex items-center gap-1.5 text-[12.5px] text-[#5A4A3A]">
-                        <FontAwesomeIcon icon={faCircleCheck} className="w-[11px] h-[11px] text-[#C4A882] shrink-0" />
+                        <CircleCheck size={12} color="#C4A882" strokeWidth={2} className="shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -220,8 +219,8 @@ export default function ServicesPage() {
       </section>
 
       {/* ── VALUES STRIP ── */}
-      <div className="bg-white border-y border-[#EDE8DF] py-5 overflow-x-auto">
-        <div className="flex items-center justify-center gap-0 min-w-max mx-auto px-6">
+      <div className="bg-white border-y border-[#EDE8DF] py-5">
+        <div className="flex flex-wrap items-center justify-center gap-0 mx-auto px-6">
           {values.map((v, i) => (
             <div key={v} className="flex items-center">
               <span className="text-[11px] tracking-[0.22em] uppercase text-[#8A7968] font-semibold whitespace-nowrap px-5">
@@ -257,7 +256,7 @@ export default function ServicesPage() {
               {marketingFeatures.slice(0, 3).map((f) => (
                 <div key={f.title} className="flex gap-3">
                   <div className="w-5 h-5 rounded-full bg-[#EDE8DF] flex items-center justify-center shrink-0 mt-0.5">
-                    <FontAwesomeIcon icon={faCircleCheck} className="w-[10px] h-[10px] text-[#7B5B3A]" />
+                    <CircleCheck size={11} color="#7B5B3A" strokeWidth={2} />
                   </div>
                   <div>
                     <p className="font-semibold text-[#1C1410] text-[14px] mb-0.5">{f.title}</p>

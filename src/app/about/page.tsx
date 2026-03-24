@@ -40,17 +40,14 @@ export default function AboutPage() {
           <div className="absolute inset-0" style={{ background: "linear-gradient(to right, rgba(15,9,5,0.82) 40%, rgba(15,9,5,0.35) 100%)" }} />
         </div>
         <div className="relative z-10 max-w-[1120px] mx-auto px-8 w-full">
-          <p className="text-[11px] tracking-[0.25em] uppercase text-white/60 mb-4">About Us</p>
+          <p className="section-label" style={{ color: "rgba(255,255,255,0.6)" }}>About Us</p>
           <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal text-[64px] leading-[1.05] mb-5">
             Get to know us
           </h1>
           <p className="text-white/85 text-[17px] leading-[1.75] max-w-[520px] mb-8">
             Meet the team behind The Cohost Company. We treat every stay like it&apos;s our own—offering guests a seamless experience while providing 5-star service through full-service hospitality and care.
           </p>
-          <Link
-            href="/contact"
-            className="inline-block px-8 py-3.5 bg-[#7B5B3A] text-white text-[12px] font-semibold tracking-[0.12em] uppercase hover:bg-[#5A3E28] transition-colors"
-          >
+          <Link href="/contact" className="btn-primary">
             Contact Us →
           </Link>
         </div>
@@ -71,7 +68,7 @@ export default function AboutPage() {
       <section className="py-24 bg-[#F7F4EF]">
         <div className="max-w-[1120px] mx-auto px-8">
           <div className="text-center mb-16">
-            <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">Leadership</p>
+            <p className="section-label" style={{ color: "#8A7968" }}>Leadership</p>
             <h2 className="font-[family-name:var(--font-playfair)] text-[48px] font-normal text-[#1C1410] leading-[1.1]">
               The Founders
             </h2>
@@ -134,7 +131,7 @@ export default function AboutPage() {
       <section className="py-20 bg-white">
         <div className="max-w-[1120px] mx-auto px-8">
           <div className="text-center mb-14">
-            <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">Our People</p>
+            <p className="section-label" style={{ color: "#8A7968" }}>Our People</p>
             <h2 className="font-[family-name:var(--font-playfair)] text-[44px] font-normal text-[#1C1410] leading-[1.1]">
               The Team
             </h2>
@@ -157,7 +154,7 @@ export default function AboutPage() {
       <section className="py-20 bg-[#F7F4EF]">
         <div className="max-w-[1120px] mx-auto px-8">
           <div className="text-center mb-14">
-            <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">What We Stand For</p>
+            <p className="section-label" style={{ color: "#8A7968" }}>What We Stand For</p>
             <h2 className="font-[family-name:var(--font-playfair)] text-[44px] font-normal text-[#1C1410] leading-[1.1]">
               Our Core Values
             </h2>
@@ -194,14 +191,14 @@ export default function AboutPage() {
           <div className="absolute inset-0 bg-[#1C0A04]/75" />
         </div>
         <div className="relative z-10 max-w-[1120px] mx-auto px-8 text-center">
-          <p className="text-[11px] tracking-[0.25em] uppercase text-[#C4A882] font-semibold mb-5">Our Heritage</p>
+          <p className="section-label mb-5">Our Heritage</p>
           <h2 className="font-[family-name:var(--font-playfair)] text-[54px] font-normal text-white leading-[1.1] mb-6">
             Pioneering Airbnb in Joshua Tree
           </h2>
           <p className="text-white/80 text-[17px] leading-[1.75] max-w-[600px] mx-auto mb-10">
             Since 2014, we&apos;ve been at the forefront of short-term rental hospitality in the High Desert—building a portfolio of thoughtfully managed homes and a reputation for exceptional guest experiences.
           </p>
-          <Link href="/stays" className="inline-block px-10 py-4 border border-white text-white text-[12px] font-semibold tracking-[0.15em] uppercase hover:bg-white hover:text-[#1C1410] transition-colors">
+          <Link href="/stays" className="btn-ghost-white">
             Browse Our Stays →
           </Link>
         </div>

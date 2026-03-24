@@ -21,7 +21,7 @@ export default function ThankYou() {
       <div className="max-w-[1120px] mx-auto px-10 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
         {/* Text */}
         <div>
-          <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">
+          <p className="section-label" style={{ color: "#8A7968" }}>
             The Cohost Company
           </p>
           <h2 className="font-[family-name:var(--font-playfair)] text-[48px] font-normal text-[#1C1410] leading-[1.1] mb-8">

@@ -404,10 +404,20 @@ export async function getCalendarDays(
   startDate: string,
   endDate: string
 ): Promise<GuestyAvailabilityDay[]> {
-  const data = await guestyFetch<GuestyAvailabilityResponse>(
-    `/availability-pricing/api/v3/listings/${listingId}?startDate=${startDate}&endDate=${endDate}`
-  );
-  return data.days ?? [];
+  // Guesty Open API v1 calendar endpoint uses from/to params
+  const data = await guestyFetch<
+    | { days: GuestyAvailabilityDay[] }
+    | { data: GuestyAvailabilityDay[] }
+    | GuestyAvailabilityDay[]
+  >(`/listings/${listingId}/calendar?from=${startDate}&to=${endDate}`);
+
+  // Handle all response shapes Guesty may return
+  if (Array.isArray(data)) return data;
+  if ("days" in data && Array.isArray((data as { days: unknown }).days))
+    return (data as { days: GuestyAvailabilityDay[] }).days;
+  if ("data" in data && Array.isArray((data as { data: unknown }).data))
+    return (data as { data: GuestyAvailabilityDay[] }).data;
+  return [];
 }
 
 /**
@@ -607,8 +617,33 @@ export async function getAllListings(): Promise<GuestyListingFull[]> {
     const limit = 100;
 
     while (true) {
+      const fields = [
+        "_id",
+        "title",
+        "nickname",
+        "accommodates",
+        "bedrooms",
+        "bathrooms",
+        "propertyType",
+        "active",
+        "isListed",
+        "isTest",
+        "address.city",
+        "address.state",
+        "address.country",
+        "address.full",
+        "address.lat",
+        "address.lng",
+        "prices.basePrice",
+        "prices.currency",
+        "prices.cleaningFee",
+        "pictures._id",
+        "pictures.original",
+        "pictures.thumbnail",
+        "pictures.sortOrder",
+      ].join(" ");
       const data = await guestyFetch<{ results?: GuestyListingFull[] }>(
-        `/listings?limit=${limit}&skip=${skip}&fields=_id,title,nickname,accommodates,bedrooms,bathrooms,propertyType,active,isTest,address,prices,pictures`
+        `/listings?limit=${limit}&skip=${skip}&fields=${encodeURIComponent(fields)}`
       );
       const page = data.results ?? [];
       all.push(...page);

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Users, BedDouble, Bath, ChevronLeft, ChevronRight } from "lucide-react";
 
 const G = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto";
 const WP = "https://thecohostcompany.com/wp-content/uploads";
@@ -39,7 +40,7 @@ function StayCard({ stay }: { stay: Stay }) {
         />
 
         {stay.badge && (
-          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[14px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
+          <span className="absolute top-3 left-3 bg-white text-[#1C1410] text-[11px] font-semibold tracking-[0.06em] uppercase px-3 py-1.5 rounded-full shadow-sm z-10">
             {stay.badge}
           </span>
         )}
@@ -52,14 +53,14 @@ function StayCard({ stay }: { stay: Stay }) {
               aria-label="Previous photo"
               className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C1410" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+              <ChevronLeft size={16} color="#1C1410" strokeWidth={2.5} />
             </button>
             <button
               onClick={next}
               aria-label="Next photo"
               className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C1410" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+              <ChevronRight size={16} color="#1C1410" strokeWidth={2.5} />
             </button>
           </>
         )}
@@ -94,16 +95,16 @@ function StayCard({ stay }: { stay: Stay }) {
         <p className="text-[16px] text-[#8A7968] flex items-center gap-2 flex-wrap">
           <span>{stay.type}</span>
           <span className="text-[#D0C8BD]">|</span>
-          <span className="flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span className="flex items-center gap-1.5">
+            <Users size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
             {stay.guests}
           </span>
-          <span className="flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M2 9V19H22V9"/><path d="M6 9V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2"/><rect x="2" y="7" width="4" height="6" rx="1"/></svg>
+          <span className="flex items-center gap-1.5">
+            <BedDouble size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
             {stay.beds}
           </span>
-          <span className="flex items-center gap-1">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><path d="M9 6V3.5a2.5 2.5 0 0 1 5 0V6"/><rect x="2" y="6" width="20" height="10" rx="2"/><path d="M6 16v2M18 16v2"/></svg>
+          <span className="flex items-center gap-1.5">
+            <Bath size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
             {stay.baths}
           </span>
         </p>

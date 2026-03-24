@@ -10,7 +10,7 @@ const quickLinks = [
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
   { label: "Guidebook", href: "/guidebook" },
-  { label: "Virtual Concierge", href: "/guidebook" },
+  { label: "Virtual Concierge", href: "/concierge" },
 ];
 
 const stayLocations = [

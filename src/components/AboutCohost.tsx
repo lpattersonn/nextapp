@@ -27,10 +27,7 @@ export default function AboutCohost() {
             hosting, and beautiful design so every experience feels personal,
             seamless, and memorable.
           </p>
-          <Link
-            href="/about"
-            className="inline-block px-8 py-3.5 bg-[#7B5B3A] text-white text-[12px] font-semibold tracking-[0.12em] uppercase hover:bg-[#5A3E28] transition-colors"
-          >
+          <Link href="/about" className="btn-primary">
             Learn More →
           </Link>
         </div>

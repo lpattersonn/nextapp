@@ -61,6 +61,37 @@
   --color-menu-bg:       #2D3100;
 }
 
+/* ── Design tokens ──────────────────────────────────────────────── */
+:root {
+  /* Typography scale */
+  --text-hero:    clamp(42px, 6vw, 72px);
+  --text-h1:      clamp(36px, 5vw, 56px);
+  --text-h2:      clamp(28px, 3.5vw, 44px);
+  --text-h3:      clamp(20px, 2.5vw, 28px);
+  --text-h4:      18px;
+  --text-body-lg: 16px;
+  --text-body:    15px;
+  --text-sm:      13px;
+  --text-xs:      11px;
+
+  /* Spacing scale */
+  --section-y:    96px;
+  --section-y-sm: 64px;
+  --card-pad:     28px;
+
+  /* Brand */
+  --brown-dark:   #1C1410;
+  --brown-mid:    #7B5B3A;
+  --brown-light:  #C4A882;
+  --bg-warm:      #F7F4EF;
+  --bg-warmest:   #FAF8F5;
+  --border-warm:  #EDE8DF;
+
+  /* Radii */
+  --radius-card:  16px;
+  --radius-btn:   6px;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -71,7 +102,136 @@ html {
 
 body {
   font-family: var(--font-inter), 'Inter', sans-serif;
-  color: var(--color-text);
+  color: var(--brown-dark);
   background: #ffffff;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: var(--text-body);
+  line-height: 1.75;
+}
+
+/* ── Typography defaults ────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+p {
+  line-height: 1.8;
+}
+
+/* ── Consistent buttons ─────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 13px 28px;
+  background: var(--brown-mid);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--radius-btn);
+  border: 2px solid transparent;
+  transition: background 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary:hover {
+  background: #5A3E28;
+  box-shadow: 0 4px 16px rgba(123,91,58,0.28);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 26px;
+  background: transparent;
+  color: var(--brown-mid);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--radius-btn);
+  border: 2px solid var(--brown-mid);
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-outline:hover {
+  background: var(--brown-mid);
+  color: white;
+  transform: translateY(-1px);
+}
+.btn-outline:active { transform: translateY(0); }
+
+.btn-ghost-white {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 26px;
+  background: transparent;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--radius-btn);
+  border: 2px solid rgba(255,255,255,0.5);
+  transition: background 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn-ghost-white:hover {
+  background: white;
+  color: var(--brown-dark);
+  border-color: white;
+}
+
+/* ── Section label ──────────────────────────────────────────────── */
+.section-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brown-light);
+  margin-bottom: 16px;
+}
+
+/* ── Card ───────────────────────────────────────────────────────── */
+.card {
+  background: white;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-warm);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.card:hover {
+  box-shadow: 0 8px 32px rgba(28,20,16,0.10);
+  transform: translateY(-2px);
+}
+
+/* ── Focus rings ────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brown-light);
+  outline-offset: 3px;
+}
+
+/* ── Smooth image loading ───────────────────────────────────────── */
+img {
+  transition: opacity 0.3s ease;
+}
+
+/* ── Hide scrollbar utility ─────────────────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

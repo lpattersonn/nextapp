@@ -5,8 +5,7 @@ import Image from "next/image";
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import type { GuestyListingFull } from "@/lib/guesty";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faBed, faBath } from "@fortawesome/free-solid-svg-icons";
+import { Users, BedDouble, Bath, ChevronLeft, ChevronRight, ImageOff } from "lucide-react";
 
 // ── Card ──────────────────────────────────────────────────────────────────────
 function StayCard({ listing }: { listing: GuestyListingFull }) {
@@ -14,9 +13,6 @@ function StayCard({ listing }: { listing: GuestyListingFull }) {
   const images = (listing.pictures ?? []).slice(0, 8).map((p) => p.original);
   const name = listing.nickname || listing.title;
   const price = listing.prices?.basePrice;
-  const city = [listing.address?.city, listing.address?.state]
-    .filter(Boolean)
-    .join(", ");
 
   const prev = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -43,17 +39,17 @@ function StayCard({ listing }: { listing: GuestyListingFull }) {
           />
         ) : (
           <div className="w-full h-full bg-[#D4C9BC] flex items-center justify-center">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#9A8A7A" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            <ImageOff size={32} color="#9A8A7A" strokeWidth={1.5} />
           </div>
         )}
 
         {images.length > 1 && (
           <>
             <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C1410" strokeWidth="2.5" strokeLinecap="round"><path d="M15 18l-6-6 6-6"/></svg>
+              <ChevronLeft size={16} color="#1C1410" strokeWidth={2.5} />
             </button>
             <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white cursor-pointer">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C1410" strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+              <ChevronRight size={16} color="#1C1410" strokeWidth={2.5} />
             </button>
           </>
         )}
@@ -75,23 +71,21 @@ function StayCard({ listing }: { listing: GuestyListingFull }) {
           </p>
         ) : null}
         <p className="text-[14px] text-[#8A7968] flex items-center gap-3 flex-wrap mt-1">
-          {city && <span>{city}</span>}
-          {city && (listing.accommodates || listing.bedrooms) && <span className="text-[#D0C8BD]">·</span>}
           {listing.accommodates ? (
             <span className="flex items-center gap-1.5">
-              <FontAwesomeIcon icon={faUser} className="w-[13px] h-[13px] text-[#7B5B3A]" />
+              <Users size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
               <span>{listing.accommodates}</span>
             </span>
           ) : null}
           {listing.bedrooms ? (
             <span className="flex items-center gap-1.5">
-              <FontAwesomeIcon icon={faBed} className="w-[14px] h-[14px] text-[#7B5B3A]" />
+              <BedDouble size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
               <span>{listing.bedrooms}</span>
             </span>
           ) : null}
           {listing.bathrooms ? (
             <span className="flex items-center gap-1.5">
-              <FontAwesomeIcon icon={faBath} className="w-[13px] h-[13px] text-[#7B5B3A]" />
+              <Bath size={13} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
               <span>{listing.bathrooms}</span>
             </span>
           ) : null}
@@ -115,7 +109,7 @@ function CardSkeleton() {
   );
 }
 
-// ── Page ──────────────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 const CITY_ORDER = [
   "Joshua Tree",
   "Pioneertown",
@@ -126,7 +120,6 @@ const CITY_ORDER = [
 
 function cityKey(listing: GuestyListingFull): string {
   const city = listing.address?.city ?? "";
-  // Normalize common variants
   if (/pioneer/i.test(city)) return "Pioneertown";
   if (/yucca/i.test(city)) return "Yucca Valley";
   if (/joshua/i.test(city)) return "Joshua Tree";
@@ -135,50 +128,40 @@ function cityKey(listing: GuestyListingFull): string {
   return city || "Other";
 }
 
+function groupByCity(all: GuestyListingFull[]) {
+  const map: Record<string, GuestyListingFull[]> = {};
+  for (const l of all) {
+    const k = cityKey(l);
+    if (!map[k]) map[k] = [];
+    map[k].push(l);
+  }
+  return map;
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
 export default function StaysPage() {
   const [listings, setListings] = useState<GuestyListingFull[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
     fetch("/api/guesty/listings")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data) => {
-        const all: GuestyListingFull[] = data.listings ?? [];
-        setListings(all);
-        // Default to first non-empty city in preferred order
-        const groups = groupByCity(all);
-        const first = CITY_ORDER.find((c) => (groups[c]?.length ?? 0) > 0)
-          ?? Object.keys(groups)[0]
-          ?? "";
-        setActiveTab(first);
+        setListings(data.listings ?? []);
         setLoading(false);
       })
       .catch(() => { setError(true); setLoading(false); });
   }, []);
 
-  function groupByCity(all: GuestyListingFull[]) {
-    const map: Record<string, GuestyListingFull[]> = {};
-    for (const l of all) {
-      const k = cityKey(l);
-      if (!map[k]) map[k] = [];
-      map[k].push(l);
-    }
-    return map;
-  }
-
   const groups = groupByCity(listings);
 
-  // Build tab list: preferred order first, then any remaining cities
-  const allCities = Array.from(
-    new Set([
-      ...CITY_ORDER.filter((c) => groups[c]?.length),
-      ...Object.keys(groups).filter((c) => !CITY_ORDER.includes(c) && groups[c]?.length),
-    ])
-  );
-
-  const active = groups[activeTab] ?? [];
+  const allCities = loading
+    ? CITY_ORDER
+    : Array.from(new Set([
+        ...CITY_ORDER.filter((c) => groups[c]?.length),
+        ...Object.keys(groups).filter((c) => !CITY_ORDER.includes(c) && groups[c]?.length),
+      ]));
 
   return (
     <>
@@ -208,87 +191,104 @@ export default function StaysPage() {
         </div>
       </section>
 
-      {/* City tabs */}
-      <div className="bg-white border-b border-[#EDE8DF] sticky top-[80px] z-40">
-        <div className="max-w-[1120px] mx-auto px-6">
-          <div className="flex items-center overflow-x-auto scrollbar-hide">
-            {loading
-              ? [1, 2, 3, 4].map((i) => (
-                  <div key={i} className="px-5 py-5 shrink-0">
-                    <div className="h-4 w-24 bg-[#EDE8DF] rounded animate-pulse" />
-                  </div>
-                ))
-              : allCities.map((city) => (
-                  <button
-                    key={city}
-                    onClick={() => setActiveTab(city)}
-                    className={`px-5 py-5 text-[14px] font-medium whitespace-nowrap border-b-2 transition-colors cursor-pointer shrink-0 ${
-                      activeTab === city
-                        ? "border-[#7B5B3A] text-[#7B5B3A]"
-                        : "border-transparent text-[#8A7968] hover:text-[#5A4A3A]"
-                    }`}
-                  >
-                    {city}
-                    <span className={`ml-2 text-[12px] ${activeTab === city ? "text-[#7B5B3A]" : "text-[#C4A882]"}`}>
-                      ({groups[city]?.length ?? 0})
-                    </span>
-                  </button>
-                ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Listings grid */}
-      <section className="py-14 bg-[#F7F4EF] min-h-[60vh]">
+      {/* Main content */}
+      <section className="py-16 bg-[#F7F4EF] min-h-[60vh]">
         <div className="max-w-[1120px] mx-auto px-6">
           {error ? (
             <div className="text-center py-20">
               <p className="text-[#8A7968] mb-4">Unable to load listings — please try again.</p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2.5 border border-[#C4A882] text-[#7B5B3A] text-[13px] rounded-full hover:bg-[#7B5B3A] hover:text-white transition-colors"
+                className="px-6 py-2.5 border border-[#C4A882] text-[#7B5B3A] text-[13px] rounded-full hover:bg-[#7B5B3A] hover:text-white transition-colors cursor-pointer"
               >
                 Retry
               </button>
             </div>
           ) : (
-            <>
-              {!loading && activeTab && (
-                <div className="mb-8">
-                  <h2 className="font-[family-name:var(--font-playfair)] text-[30px] font-normal text-[#1C1410]">
-                    {activeTab}
-                  </h2>
-                  <p className="text-[14px] text-[#8A7968] mt-1">
-                    {active.length} {active.length === 1 ? "property" : "properties"}
-                  </p>
-                </div>
-              )}
+            <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-14">
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {loading
-                  ? [...Array(6)].map((_, i) => <CardSkeleton key={i} />)
-                  : active.map((listing) => (
-                      <StayCard key={listing._id} listing={listing} />
-                    ))}
+              {/* ── Left: sticky location nav ── */}
+              <div className="lg:sticky lg:top-24 lg:self-start">
+                <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-4">
+                  Locations
+                </p>
+                <nav className="flex flex-col gap-1">
+                  {allCities.map((city) => (
+                    <a
+                      key={city}
+                      href={`#${city.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="flex items-center justify-between px-3 py-2 rounded-lg text-[14px] text-[#5A4A3A] hover:bg-white hover:text-[#7B5B3A] transition-colors group"
+                    >
+                      <span>{city}</span>
+                      {!loading && groups[city] && (
+                        <span className="text-[12px] text-[#C4A882] group-hover:text-[#7B5B3A] transition-colors">
+                          {groups[city].length}
+                        </span>
+                      )}
+                    </a>
+                  ))}
+                </nav>
+
+                <div className="mt-8 pt-6 border-t border-[#EDE8DF]">
+                  <p className="text-[13px] text-[#8A7968] leading-[1.7] mb-4">
+                    Looking for something specific?
+                  </p>
+                  <Link
+                    href="/contact"
+                    className="inline-block px-5 py-2 border border-[#C4A882] text-[#7B5B3A] text-[13px] font-medium rounded-full hover:bg-[#7B5B3A] hover:text-white hover:border-[#7B5B3A] transition-colors"
+                  >
+                    Contact Us
+                  </Link>
+                </div>
               </div>
 
-              {!loading && active.length === 0 && !error && (
-                <div className="text-center py-20">
-                  <p className="text-[#8A7968]">No properties found in this area.</p>
-                </div>
-              )}
-            </>
-          )}
+              {/* ── Right: location groups ── */}
+              <div className="space-y-16">
+                {loading ? (
+                  // Skeleton groups
+                  [1, 2].map((g) => (
+                    <div key={g}>
+                      <div className="h-7 w-40 bg-[#E8E2DA] rounded animate-pulse mb-2" />
+                      <div className="h-4 w-24 bg-[#E8E2DA] rounded animate-pulse mb-6" />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {[1, 2, 3].map((i) => <CardSkeleton key={i} />)}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  allCities.map((city) => {
+                    const cityListings = groups[city] ?? [];
+                    if (!cityListings.length) return null;
+                    return (
+                      <div
+                        key={city}
+                        id={city.toLowerCase().replace(/\s+/g, "-")}
+                        className="scroll-mt-24"
+                      >
+                        {/* Section header */}
+                        <div className="flex items-center justify-between mb-2 pb-3 border-b border-[#EDE8DF]">
+                          <h2 className="font-[family-name:var(--font-playfair)] text-[28px] font-normal text-[#1C1410]">
+                            {city}
+                          </h2>
+                          <span className="text-[13px] text-[#8A7968]">
+                            {cityListings.length} {cityListings.length === 1 ? "property" : "properties"}
+                          </span>
+                        </div>
 
-          <div className="mt-12 text-center">
-            <p className="text-[14px] text-[#8A7968] mb-4">Looking for something specific? We&apos;ll find the perfect match.</p>
-            <Link
-              href="/contact"
-              className="inline-block px-10 py-3.5 bg-[#7B5B3A] text-white text-[12px] font-semibold tracking-[0.12em] uppercase hover:bg-[#5A3E28] transition-colors rounded-xl"
-            >
-              Contact Us →
-            </Link>
-          </div>
+                        {/* Grid */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                          {cityListings.map((listing) => (
+                            <StayCard key={listing._id} listing={listing} />
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+            </div>
+          )}
         </div>
       </section>
 

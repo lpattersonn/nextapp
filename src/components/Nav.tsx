@@ -313,35 +313,112 @@ export default function Nav() {
           onClick={() => setMenuOpen(!menuOpen)}
           aria-label="Toggle menu"
         >
-          <span className={`w-6 h-0.5 bg-white transition-transform ${menuOpen ? "rotate-45 translate-y-2" : ""}`} />
-          <span className={`w-6 h-0.5 bg-white transition-opacity ${menuOpen ? "opacity-0" : ""}`} />
-          <span className={`w-6 h-0.5 bg-white transition-transform ${menuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
+          <span className="w-6 h-0.5 bg-white" />
+          <span className="w-6 h-0.5 bg-white" />
+          <span className="w-6 h-0.5 bg-white" />
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile drawer overlay */}
       {menuOpen && (
-        <div className="md:hidden bg-[#2D1B0E] border-t border-white/10 px-8 py-6 flex flex-col gap-4">
-          <Link href="/stays" className="text-[16px] text-white font-medium" onClick={() => setMenuOpen(false)}>Stays</Link>
-          {otherNavItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="text-[16px] text-white font-medium"
-              onClick={() => setMenuOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div
+          className="md:hidden fixed inset-0 z-50"
+          style={{ background: "rgba(0,0,0,0.45)" }}
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile drawer — slides in from right */}
+      <div
+        className="md:hidden fixed top-0 right-0 bottom-0 z-[60] w-[88vw] max-w-[360px] flex flex-col overflow-y-auto transition-transform duration-300 ease-in-out"
+        style={{
+          background: "#fff",
+          transform: menuOpen ? "translateX(0)" : "translateX(100%)",
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#EDE8DF]">
+          <Image
+            src="https://thecohostcompany.com/wp-content/uploads/2025/05/Logos.svg"
+            alt="The Cohost Company"
+            width={160}
+            height={48}
+            className="object-contain"
+            unoptimized
+            style={{ filter: "invert(1) sepia(1) saturate(2) hue-rotate(340deg) brightness(0.35)" }}
+          />
+          <button
+            onClick={() => setMenuOpen(false)}
+            className="w-9 h-9 rounded-full bg-[#F7F4EF] flex items-center justify-center"
+            aria-label="Close menu"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1C1410" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Book Your Stays */}
+        <div className="px-6 pt-6 pb-4">
+          <p className="text-[11px] tracking-[0.22em] uppercase text-[#8A7968] font-semibold mb-4">
+            Book Your Stays
+          </p>
+          <div className="flex flex-col gap-3">
+            {getDisplayProperties(null).map((p) => (
+              <Link
+                key={p.slug}
+                href={`/property/${p.slug}`}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-3 rounded-xl overflow-hidden border border-[#EDE8DF] hover:border-[#C4A882] transition-colors"
+              >
+                <div className="relative w-[72px] h-[60px] shrink-0">
+                  <Image src={p.images[0]} alt={p.name} fill className="object-cover" unoptimized />
+                </div>
+                <div className="py-2 pr-3">
+                  <p className="text-[14px] font-semibold text-[#1C1410] leading-snug">{p.name}</p>
+                  <p className="text-[12px] text-[#8A7968] mt-0.5">{p.guests} Guests · {p.beds} Bedrooms</p>
+                </div>
+              </Link>
+            ))}
+          </div>
           <Link
             href="/stays"
-            className="mt-2 px-6 py-3 rounded-full bg-[#8D5F52] text-white text-[16px] font-semibold text-center"
             onClick={() => setMenuOpen(false)}
+            className="mt-4 block w-full py-3 rounded-full bg-[#1C1410] text-white text-[14px] font-semibold text-center tracking-wide hover:bg-[#3A2F25] transition-colors"
           >
-            Book Now
+            View All Listings
           </Link>
         </div>
-      )}
+
+        {/* Divider */}
+        <div className="mx-6 border-t border-[#EDE8DF]" />
+
+        {/* Quick Menu */}
+        <div className="px-6 pt-5 pb-8">
+          <p className="text-[11px] tracking-[0.22em] uppercase text-[#8A7968] font-semibold mb-4">
+            Quick Menu
+          </p>
+          <div className="flex flex-col gap-1">
+            {[
+              { label: "Home", href: "/" },
+              { label: "Guidebook (For Guests)", href: "/guidebook" },
+              { label: "Services (For Hosts)", href: "/services" },
+              { label: "About Us", href: "/about" },
+              { label: "Press", href: "/press" },
+              { label: "Contact", href: "/contact" },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="py-3 text-[16px] text-[#1C1410] font-medium border-b border-[#F0EBE3] hover:text-[#7B5B3A] transition-colors last:border-0"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
     </nav>
   );
 }
