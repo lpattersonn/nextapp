@@ -319,14 +319,9 @@ function PlaceCard({
 }) {
   return (
     <div className="bg-white rounded-2xl overflow-hidden border border-[#EDE8DF] hover:shadow-md transition-shadow duration-200">
-      {/* Image pair */}
-      <div className="grid grid-cols-2 gap-0.5 h-[150px]">
-        <div className="relative overflow-hidden bg-[#EDE8DF]">
-          <Image src={images[0]} alt={name} fill className="object-cover" unoptimized />
-        </div>
-        <div className="relative overflow-hidden bg-[#E0D8D0]">
-          {images[1] && <Image src={images[1]} alt="" fill className="object-cover" unoptimized />}
-        </div>
+      {/* Square image */}
+      <div className="relative aspect-square overflow-hidden bg-[#EDE8DF]">
+        <Image src={images[0]} alt={name} fill className="object-cover" unoptimized />
       </div>
 
       {/* Content */}

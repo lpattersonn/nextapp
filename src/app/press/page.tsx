@@ -4,219 +4,262 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 
 const BASE = "https://thecohostcompany.com/wp-content/uploads";
-const G = "https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto";
+const G = "https://assets.guesty.com/image/upload/w_900,q_auto,f_auto";
 
-const pressLogos = [
-  { name: "Logo-01", src: `${BASE}/2025/05/Logo-01.svg`, cls: "h-7 w-32" },
-  { name: "Logo-02", src: `${BASE}/2025/05/Logo-02.svg`, cls: "h-7 w-40" },
-  { name: "Logo-03", src: `${BASE}/2025/05/Logo-03.svg`, cls: "h-5 w-20" },
-  { name: "Logo-04", src: `${BASE}/2025/05/Logo-04.svg`, cls: "h-5 w-20" },
-  { name: "Logo-05", src: `${BASE}/2025/05/Logo-05.svg`, cls: "h-5 w-20" },
-];
+// ── Stylised publication name renderer ─────────────────────────────────────
+function PubName({ name }: { name: string }) {
+  const lower = name.toLowerCase();
+  if (lower === "dwell")
+    return <span className="font-[family-name:var(--font-playfair)] italic text-[22px] text-[#1C1410] tracking-tight">dwell</span>;
+  if (lower === "netflix")
+    return <span className="text-[20px] font-black tracking-[-0.02em] text-[#E50914]">NETFLIX</span>;
+  if (lower === "afar")
+    return <span className="font-[family-name:var(--font-playfair)] text-[20px] tracking-[0.18em] text-[#1C1410] uppercase">AFAR</span>;
+  if (lower === "jetset")
+    return <span className="text-[20px] font-light italic tracking-wide text-[#1C1410]">Jetset</span>;
+  if (lower === "jones")
+    return <span className="text-[20px] font-black tracking-[0.12em] text-[#1C1410] uppercase">JONES</span>;
+  if (lower === "women")
+    return <span className="text-[20px] font-bold tracking-[0.08em] text-[#1C1410] uppercase">WOMEN</span>;
+  if (lower === "vrbo")
+    return <span className="text-[20px] font-black tracking-[-0.01em] text-[#3D6BE8]">Vrbo</span>;
+  if (lower === "territory")
+    return <span className="text-[20px] font-black tracking-[0.14em] text-[#1C1410] uppercase">TERRITORY</span>;
+  if (lower === "inside out")
+    return <span className="font-[family-name:var(--font-playfair)] italic text-[20px] text-[#1C1410]">Inside Out</span>;
+  if (lower.includes("palm springs"))
+    return <span className="font-[family-name:var(--font-playfair)] text-[18px] tracking-[0.06em] text-[#7B5B3A] font-normal italic">Palm Springs Life</span>;
+  if (lower.includes("travel") && lower.includes("leisure"))
+    return <span className="text-[18px] font-semibold tracking-[0.04em] text-[#1C1410]">Travel + Leisure</span>;
+  if (lower.includes("culture"))
+    return <span className="text-[18px] font-semibold tracking-[0.1em] uppercase text-[#1C1410]">CULTURE TAGS</span>;
+  if (lower.includes("travelblogger") || lower.includes("travel blogger"))
+    return <span className="text-[18px] font-semibold text-[#1C1410]">TravelBlogger</span>;
+  if (lower.includes("about your dream"))
+    return <span className="font-[family-name:var(--font-playfair)] italic text-[18px] text-[#7B5B3A]">About Your Dream</span>;
+  if (lower.includes("7 ") || lower === "7stars" || lower === "7 stars")
+    return <span className="text-[18px] font-bold tracking-[0.06em] text-[#1C1410]">7 <span className="text-[#C4A882]">★</span> Travel</span>;
+  if (lower.includes("field"))
+    return <span className="text-[18px] font-bold tracking-[0.12em] uppercase text-[#1C1410]">FIELD</span>;
+  if (lower.includes("design") || lower.includes("dezeen"))
+    return <span className="font-[family-name:var(--font-playfair)] text-[18px] italic text-[#1C1410]">{name}</span>;
+  if (lower.includes("de la mer") || lower.includes("provence"))
+    return <span className="font-[family-name:var(--font-playfair)] text-[18px] italic tracking-wide text-[#7B5B3A]">{name}</span>;
+  return <span className="text-[18px] font-semibold tracking-[0.06em] text-[#1C1410] uppercase">{name}</span>;
+}
 
-const pressArticles = [
-  {
-    publication: "Netflix",
-    logo: `${BASE}/2025/05/Logo-01.svg`,
-    headline: "The World's Most Amazing Vacation Rentals",
-    excerpt: "The Outlaw in Pioneertown was featured on Netflix for its stunning design and unforgettable guest experience.",
-    property: "The Outlaw",
-    propertyImg: `${G}/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg`,
-    link: "#",
-    type: "feature",
-  },
-  {
-    publication: "Dwell",
-    logo: `${BASE}/2025/05/Logo-02.svg`,
-    headline: "16 Ultimate Joshua Tree Airbnbs",
-    excerpt: "Cielito Lindo Retreat was named among Dwell's picks for its hot tub sunken into a wraparound infinity deck.",
-    property: "Cielito Lindo Retreat",
-    propertyImg: `${G}/listing_images_s3/production/property-photos/37fbd8d6503184919d1773d505e2608c62d0958500918990/68e0a688f84fbf0012f27c1d/36e485f6-d6a2-4a-vArrg`,
-    link: "#",
-    type: "feature",
-  },
-  {
-    publication: "Condé Nast Traveler",
-    logo: `${BASE}/2025/05/Logo-03.svg`,
-    headline: "Best Desert Escapes in Southern California",
-    excerpt: "The Cohost Company's portfolio of thoughtfully managed homes was highlighted for exceptional design and service.",
-    property: null,
-    propertyImg: null,
-    link: "#",
-    type: "mention",
-  },
-  {
-    publication: "VICE",
-    logo: `${BASE}/2025/05/Logo-04.svg`,
-    headline: "The Wildest Houses You Can Rent in Joshua Tree",
-    excerpt: "The Artanis and Mod West Ranch were featured in VICE's roundup of the most extraordinary short-term rentals in the High Desert.",
-    property: "The Artanis Villa",
-    propertyImg: `${G}/v1763770623/production/68df18d0ea1895d9005ea6ad/rgojuyifdkefev9xs5ge.jpg`,
-    link: "#",
-    type: "feature",
-  },
+// ── Data ──────────────────────────────────────────────────────────────────────
+const logoNames = ["dwell", "WOMEN", "7 Stars", "AFAR", "Jetset", "JONES"];
+
+const articles = [
   {
     publication: "Palm Springs Life",
-    logo: `${BASE}/2025/05/Logo-05.svg`,
     headline: "The High Desert Airbnb Game",
-    excerpt: "A deep-dive into The Cohost Company's model of partnering with homeowners and cash-flow investors to manage and market high-end desert rentals.",
-    property: null,
-    propertyImg: null,
-    link: "#",
-    type: "feature",
+    excerpt: "The Cohost Company founders were recognized for their deep understanding of the Joshua Tree market, offering a data-driven approach that delivers returns and peace of mind to property owners.",
+    img: `${G}/v1763770623/production/68df18d0ea1895d9005ea6ad/rgojuyifdkefev9xs5ge.jpg`,
+    href: "#",
   },
   {
-    publication: "Big Seven Travel",
-    logo: `${BASE}/2025/05/Logo-01.svg`,
-    headline: "Most Instagrammable Desert Rentals",
-    excerpt: "Whistling Rock and Boulders Gate were named among the most share-worthy properties in the American Southwest.",
-    property: "Boulders Gate",
-    propertyImg: `${G}/v1765152133/production/68df18d0ea1895d9005ea6ad/gkpt8qq78dfxkqu76hnm.jpg`,
-    link: "#",
-    type: "feature",
+    publication: "Netflix",
+    headline: "The World's Most Amazing Vacation Rentals",
+    excerpt: "The Outlaw in Pioneertown was featured on Netflix for its stunning design and unforgettable guest experience — placing it among the most recognized vacation homes in the world.",
+    img: `${G}/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg`,
+    href: "#",
   },
   {
-    publication: "Lodgify",
-    logo: `${BASE}/2025/05/Logo-02.svg`,
-    headline: "15 Social Media Stars Inspiring Vacation Rental Hosts in 2023",
-    excerpt: "The Cohost Company was included among Lodgify's top vacation rental hosts driving the industry forward.",
-    property: null,
-    propertyImg: null,
-    link: "#",
-    type: "award",
+    publication: "dwell",
+    headline: "16 Ultimate Joshua Tree Airbnbs",
+    excerpt: "Dwell named Cielito Lindo Retreat among the greatest desert escapes in California for its hot tub sunken into a wraparound infinity deck and breathtaking High Desert views.",
+    img: `${G}/v1765152133/production/68df18d0ea1895d9005ea6ad/gkpt8qq78dfxkqu76hnm.jpg`,
+    href: "#",
   },
   {
-    publication: "Whimsy Soul",
-    logo: `${BASE}/2025/05/Logo-03.svg`,
-    headline: "The Gaslight: 360° Views Atop a Joshua Tree Hillside",
-    excerpt: "An in-depth feature on The Gaslight, one of The Cohost Company's most dramatic and design-forward properties.",
-    property: null,
-    propertyImg: null,
-    link: "#",
-    type: "feature",
+    publication: "Travel + Leisure",
+    headline: "Best Desert Vacation Rentals in the American Southwest",
+    excerpt: "The Cohost Company's portfolio was highlighted as a benchmark for quality and hospitality in the short-term rental industry across the High Desert region.",
+    img: `${G}/v1763153882/production/68df18d0ea1895d9005ea6ad/xc9rn7nrrvuajaomqa4c.jpg`,
+    href: "#",
   },
   {
-    publication: "Field Magazine",
-    logo: `${BASE}/2025/05/Logo-04.svg`,
-    headline: "Desert Living Done Right",
-    excerpt: "The Cohost Company's approach to high-desert hospitality was celebrated as a model for the modern vacation rental industry.",
-    property: null,
-    propertyImg: null,
-    link: "#",
-    type: "mention",
+    publication: "Culture Tags",
+    headline: "Why Joshua Tree is the New Palm Springs",
+    excerpt: "Culture Tags explored the rising appeal of the Hi-Desert, citing The Cohost Company's collection of design-driven properties as central to the shift in traveler preferences.",
+    img: `${BASE}/2025/05/Joshua-Tree-National-Park-.webp`,
+    href: "#",
+  },
+  {
+    publication: "Vrbo",
+    headline: "Most Wishlisted Properties on Vrbo — Desert Edition",
+    excerpt: "Three Cohost Company properties appeared in Vrbo's annual roundup of the most saved and wishlisted vacation rentals across Southern California.",
+    img: `${G}/v1768337449/production/68df18d0ea1895d9005ea6ad/nisb8jvpdap0tqocdzwu.jpg`,
+    href: "#",
+  },
+  {
+    publication: "TravelBlogger",
+    headline: "The Outlaw: A Pioneertown Icon You Have to Experience",
+    excerpt: "An immersive feature reviewing The Outlaw — from the cowboy-boot tub to the fire pit under desert stars — named it one of the most memorable rental experiences in the US.",
+    img: `${BASE}/2025/05/Historic-film-set-turned-charming-Old-West-town.webp`,
+    href: "#",
+  },
+  {
+    publication: "TravelBlogger",
+    headline: "10 Desert Stays That Will Make You Never Want to Leave",
+    excerpt: "Whistling Rock and Boulders Gate were featured as top picks for guests seeking secluded luxury in the Yucca Valley and Joshua Tree corridor.",
+    img: `${BASE}/2025/05/YV-Whistling-Rock-01.webp`,
+    href: "#",
+  },
+  {
+    publication: "Inside Out",
+    headline: "Desert Modernism: Inside the High Desert's Most Distinctive Homes",
+    excerpt: "A design deep-dive into the interiors and architecture of Cohost Company-managed properties, celebrating mid-century and brutalist vernacular design in the Mojave.",
+    img: `${G}/v1763770623/production/68df18d0ea1895d9005ea6ad/rgojuyifdkefev9xs5ge.jpg`,
+    href: "#",
+  },
+  {
+    publication: "About Your Dream",
+    headline: "Living the Dream: Passive Income Through Short-Term Rentals",
+    excerpt: "About Your Dream interviewed The Cohost Company founders on how they help property owners build income-producing vacation homes without lifting a finger.",
+    img: `${G}/v1765152133/production/68df18d0ea1895d9005ea6ad/gkpt8qq78dfxkqu76hnm.jpg`,
+    href: "#",
+  },
+  {
+    publication: "7 Stars",
+    headline: "7 Rentals That Deliver a Truly 5-Star Desert Experience",
+    excerpt: "Seven standout desert stays were curated for travelers who refuse to compromise — with two Cohost Company properties earning top honors for hospitality and design.",
+    img: `${BASE}/2025/05/Hiking-Rock-Climbing.webp.webp`,
+    href: "#",
+  },
+  {
+    publication: "JONES",
+    headline: "The Modern Joshua Tree: Design-Led Rentals Redefining Hospitality",
+    excerpt: "JONES profiled The Cohost Company's approach to pairing thoughtful interior design with seamless property management, earning praise for setting a new industry standard.",
+    img: `${G}/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg`,
+    href: "#",
+  },
+  {
+    publication: "Territory",
+    headline: "The Untamed Allure of Joshua Tree's Luxury Rental Scene",
+    excerpt: "Territory magazine explored why Joshua Tree has become one of the fastest-growing luxury vacation rental markets in the US, with The Cohost Company leading the charge.",
+    img: `${G}/v1763153882/production/68df18d0ea1895d9005ea6ad/xc9rn7nrrvuajaomqa4c.jpg`,
+    href: "#",
+  },
+  {
+    publication: "WOMEN",
+    headline: "Women in Real Estate: Building an Airbnb Empire in the Desert",
+    excerpt: "WOMEN magazine spotlighted the women behind The Cohost Company's growth story, celebrating their role in redefining the short-term rental landscape in the High Desert.",
+    img: `${BASE}/2025/10/NEW-ABOUT-PHOTO-.webp`,
+    href: "#",
+  },
+  {
+    publication: "De La Mer + Provence",
+    headline: "Where the Desert Meets Luxury: The Cohost Company's Vision",
+    excerpt: "An editorial feature celebrating the brand's aesthetic and hospitality philosophy — blending rustic desert character with elevated modern comfort.",
+    img: `${G}/v1768337449/production/68df18d0ea1895d9005ea6ad/nisb8jvpdap0tqocdzwu.jpg`,
+    href: "#",
   },
 ];
 
+// ── Page ─────────────────────────────────────────────────────────────────────
 export default function PressPage() {
   return (
     <>
       <Nav />
 
-      {/* Hero */}
-      <section className="relative h-[400px] flex items-center overflow-hidden">
+      {/* ── HERO ── */}
+      <section className="relative h-[360px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src={`${BASE}/2025/05/Joshua-Tree-National-Park-.webp`}
+            src={`${G}/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg`}
             alt="Press"
             fill
             priority
-            className="object-cover object-center"
+            className="object-cover object-top"
             unoptimized
           />
-          <div className="absolute inset-0 bg-[#1C0A04]/72" />
+          <div className="absolute inset-0 bg-[#0D0603]/78" />
         </div>
-        <div className="relative z-10 max-w-[1120px] mx-auto px-8 w-full text-center">
-          <p className="text-[11px] tracking-[0.25em] uppercase text-[#C4A882] font-semibold mb-5">Media</p>
-          <h1 className="font-[family-name:var(--font-playfair)] text-white font-normal text-[72px] leading-[1.0] mb-5">
+        <div className="relative z-10 text-center px-6">
+          <h1
+            className="font-[family-name:var(--font-playfair)] text-white font-normal tracking-[0.18em] uppercase"
+            style={{ fontSize: "clamp(48px, 7vw, 80px)" }}
+          >
             Press
           </h1>
-          <p className="text-white/80 text-[17px] leading-[1.75] max-w-[560px] mx-auto">
-            As featured in top publications across travel, design, and hospitality—here&apos;s what the world is saying about us.
-          </p>
         </div>
       </section>
 
-      {/* Featured publications strip */}
-      <div className="bg-white border-b border-[#EDE8DF] py-8">
-        <div className="max-w-[1120px] mx-auto px-8">
-          <p className="text-center text-[10px] tracking-[0.25em] uppercase text-[#8A7968] mb-6">Featured In</p>
-          <div className="flex items-center justify-center gap-10 flex-wrap">
-            {pressLogos.map((logo) => (
-              <div key={logo.name} className={`relative ${logo.cls} opacity-40 hover:opacity-70 transition-opacity`}>
-                <Image src={logo.src} alt={logo.name} fill className="object-contain" unoptimized />
-              </div>
-            ))}
-          </div>
+      {/* ── PUBLICATION LOGOS STRIP ── */}
+      <div className="bg-[#FAF8F5] border-b border-[#EDE8DF] py-7">
+        <div className="max-w-[1000px] mx-auto px-8 flex items-center justify-center gap-8 flex-wrap">
+          {logoNames.map((name) => (
+            <div key={name} className="opacity-50 hover:opacity-90 transition-opacity">
+              <PubName name={name} />
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Press articles grid */}
-      <section className="py-24 bg-[#F7F4EF]">
-        <div className="max-w-[1120px] mx-auto px-8">
-          <div className="text-center mb-14">
-            <p className="text-[11px] tracking-[0.18em] uppercase text-[#8A7968] font-semibold mb-3">Coverage</p>
-            <h2 className="font-[family-name:var(--font-playfair)] text-[44px] font-normal text-[#1C1410] leading-[1.1]">
-              Press Features
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {pressArticles.map((article, i) => (
-              <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-                {article.propertyImg && (
-                  <div className="relative h-[200px] overflow-hidden">
-                    <Image src={article.propertyImg} alt={article.property || article.publication} fill className="object-cover hover:scale-105 transition-transform duration-700" unoptimized />
-                    {article.type === "award" && (
-                      <span className="absolute top-3 left-3 bg-[#7B5B3A] text-white text-[10px] font-semibold tracking-[0.08em] uppercase px-3 py-1.5 rounded-full">Award</span>
-                    )}
-                  </div>
-                )}
-                <div className="p-7">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="relative h-5 w-20 opacity-60">
-                      <Image src={article.logo} alt={article.publication} fill className="object-contain object-left" unoptimized />
-                    </div>
-                    {!article.propertyImg && (
-                      <span className={`text-[10px] font-semibold tracking-[0.08em] uppercase px-2.5 py-1 rounded-full ${article.type === "award" ? "bg-[#7B5B3A] text-white" : "bg-[#F7F4EF] text-[#8A7968]"}`}>
-                        {article.type === "award" ? "Award" : article.publication}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-[family-name:var(--font-playfair)] text-[18px] font-normal text-[#1C1410] leading-snug mb-3">
-                    {article.headline}
-                  </h3>
-                  <p className="text-[13px] text-[#8A7968] leading-[1.8] mb-5">{article.excerpt}</p>
-                  <div className="flex items-center gap-3">
-                    <Link href={article.link} className="text-[12px] font-semibold tracking-[0.08em] uppercase text-[#7B5B3A] hover:underline">
-                      View Article →
-                    </Link>
-                    {article.property && (
-                      <>
-                        <span className="text-[#D0C8BD]">|</span>
-                        <Link href="/stays" className="text-[12px] font-semibold tracking-[0.08em] uppercase text-[#8A7968] hover:text-[#7B5B3A] hover:underline">
-                          Book {article.property} →
-                        </Link>
-                      </>
-                    )}
-                  </div>
+      {/* ── ARTICLES ── */}
+      <section className="bg-[#FAF8F5] py-6">
+        <div className="max-w-[900px] mx-auto px-6">
+          {articles.map((article, i) => (
+            <div
+              key={i}
+              className={`grid grid-cols-1 sm:grid-cols-[1fr_280px] gap-8 items-center py-12 ${
+                i < articles.length - 1 ? "border-b border-[#EDE8DF]" : ""
+              }`}
+            >
+              {/* Left: text */}
+              <div>
+                <div className="mb-4">
+                  <PubName name={article.publication} />
                 </div>
+                <h2
+                  className="font-[family-name:var(--font-playfair)] text-[#1C1410] font-normal leading-[1.3] mb-4"
+                  style={{ fontSize: "clamp(18px, 2.2vw, 24px)" }}
+                >
+                  {article.headline}
+                </h2>
+                <p className="text-[14px] text-[#6A5A4A] leading-[1.85] mb-6">
+                  {article.excerpt}
+                </p>
+                <Link
+                  href={article.href}
+                  className="inline-block px-5 py-2 border border-[#7B5B3A] text-[#7B5B3A] text-[11px] font-semibold tracking-[0.14em] uppercase hover:bg-[#7B5B3A] hover:text-white transition-colors rounded-sm"
+                >
+                  Read More
+                </Link>
               </div>
-            ))}
-          </div>
+
+              {/* Right: image */}
+              <div className="relative h-[200px] sm:h-[180px] rounded-xl overflow-hidden bg-[#EDE8DF] shadow-sm">
+                <Image
+                  src={article.img}
+                  alt={article.headline}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Press inquiry CTA */}
-      <section className="py-16 bg-[#3D1810] text-center">
+      {/* ── PRESS INQUIRY ── */}
+      <section className="py-16 bg-[#1C1410] text-center">
         <div className="max-w-[1120px] mx-auto px-8">
-          <h2 className="font-[family-name:var(--font-playfair)] text-[38px] font-normal text-white mb-4">
+          <p className="text-[11px] tracking-[0.22em] uppercase text-[#C4A882] font-semibold mb-4">Media</p>
+          <h2 className="font-[family-name:var(--font-playfair)] text-white font-normal mb-4"
+            style={{ fontSize: "clamp(26px, 3.5vw, 38px)" }}>
             Press Inquiries
           </h2>
-          <p className="text-white/75 text-[16px] mb-8 max-w-[480px] mx-auto">
-            Interested in featuring The Cohost Company? We&apos;d love to connect with you.
+          <p className="text-white/65 text-[15px] mb-7 max-w-[420px] mx-auto leading-[1.85]">
+            Interested in featuring The Cohost Company? We&apos;d love to connect.
           </p>
           <Link
             href="mailto:reservations@thecohostcompany.com"
-            className="inline-block px-10 py-4 border border-white text-white text-[12px] font-semibold tracking-[0.15em] uppercase hover:bg-white hover:text-[#1C1410] transition-colors"
+            className="inline-block px-9 py-3.5 border border-white/40 text-white text-[12px] font-semibold tracking-[0.14em] uppercase hover:bg-white hover:text-[#1C1410] transition-colors rounded-sm"
           >
             reservations@thecohostcompany.com
           </Link>
