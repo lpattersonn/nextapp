@@ -50,7 +50,7 @@ function PhotoGrid({ images, name }: { images: string[]; name: string }) {
           style={{ gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: "clamp(280px, 45vw, 480px)" }}
         >
           <div className="row-span-2 relative cursor-pointer overflow-hidden group rounded-l-xl" onClick={() => open(0)}>
-            <Image src={main} alt={name} fill className="object-cover group-hover:brightness-95 transition duration-300" unoptimized />
+            <Image src={main} alt={name} fill priority className="object-cover group-hover:brightness-95 transition duration-300" unoptimized />
           </div>
           {filled.map((img, i) => (
             <div
@@ -428,6 +428,7 @@ function CalendarMonth({
   onPrev,
   onNext,
   dayStatuses = {},
+  loading = false,
 }: {
   year: number;
   month: number;
@@ -437,11 +438,13 @@ function CalendarMonth({
   onNext: () => void;
   /** Map of YYYY-MM-DD → availability status from Guesty */
   dayStatuses?: Record<string, "available" | "unavailable" | "booked" | "blocked">;
+  loading?: boolean;
 }) {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayISO = today.toISOString().split("T")[0];
 
   const cells: (number | null)[] = [];
   for (let i = 0; i < firstDay; i++) cells.push(null);
@@ -468,22 +471,35 @@ function CalendarMonth({
         ))}
         {cells.map((d, i) => {
           if (!d) return <span key={`e-${i}`} />;
-          const date = new Date(year, month, d);
-          const isPast = date < today;
           const key = toDateKey(year, month, d);
+          const isPast = key < todayISO;
           const status = dayStatuses[key];
 
-          let cellClass = "text-[#1C1410] hover:bg-[#f0ebe3] cursor-default";
+          let cellClass = "";
+          let title = "";
+
           if (isPast) {
-            cellClass = "text-[#C0B8AE]";
-          } else if (status === "booked" || status === "unavailable" || status === "blocked") {
-            cellClass = "bg-[#fde8e8] text-[#b45555] line-through cursor-not-allowed";
+            cellClass = "text-[#C8C0B8] cursor-default";
+          } else if (loading) {
+            cellClass = "bg-[#f0ebe3] animate-pulse rounded-full text-transparent cursor-default";
+          } else if (status === "booked" || status === "blocked") {
+            cellClass = "bg-[#fde8e8] text-[#c0524f] line-through cursor-not-allowed font-medium";
+            title = "Not available";
+          } else if (status === "unavailable") {
+            cellClass = "bg-[#fde8e8] text-[#c0524f] line-through cursor-not-allowed font-medium";
+            title = "Not available";
+          } else if (status === "available") {
+            cellClass = "bg-[#e8f5ec] text-[#2d6a4f] font-medium hover:bg-[#d4edda] cursor-default";
+            title = "Available";
+          } else {
+            // Status not yet loaded — neutral style
+            cellClass = "text-[#5A4A3A] cursor-default";
           }
 
           return (
             <div
               key={d}
-              title={status && !isPast ? status : undefined}
+              title={title || undefined}
               className={`flex items-center justify-center h-8 w-full text-[13px] rounded-full mx-auto transition-colors ${cellClass}`}
             >
               {d}
@@ -590,6 +606,7 @@ export default function PropertyPage() {
   const [calStart, setCalStart] = useState({ year: now.getFullYear(), month: now.getMonth() });
   // dayStatuses: YYYY-MM-DD → Guesty availability status (fetched lazily)
   const [dayStatuses, setDayStatuses] = useState<Record<string, "available" | "unavailable" | "booked" | "blocked">>({});
+  const [calLoading, setCalLoading] = useState(false);
 
   const calSecond = {
     year: calStart.month === 11 ? calStart.year + 1 : calStart.year,
@@ -622,13 +639,13 @@ export default function PropertyPage() {
   useEffect(() => {
     if (!property?.guestyId) return;
 
-    // Fetch from calStart through the end of the month after calSecond (3 months total)
     const start = new Date(calStart.year, calStart.month, 1);
-    const endRaw = new Date(calStart.year, calStart.month + 3, 0); // last day of month+2
-    const fmt = (d: Date) => d.toISOString().split("T")[0];
+    const endRaw = new Date(calStart.year, calStart.month + 3, 0);
+    const fmtD = (d: Date) => d.toISOString().split("T")[0];
 
+    setCalLoading(true);
     fetch(
-      `/api/guesty/calendar?listingId=${property.guestyId}&startDate=${fmt(start)}&endDate=${fmt(endRaw)}`
+      `/api/guesty/calendar?listingId=${property.guestyId}&startDate=${fmtD(start)}&endDate=${fmtD(endRaw)}`
     )
       .then(r => r.ok ? r.json() : Promise.reject())
       .then((data: { days: Array<{ date: string; status: "available" | "unavailable" | "booked" | "blocked" }> }) => {
@@ -639,8 +656,9 @@ export default function PropertyPage() {
             return next;
           });
         }
+        setCalLoading(false);
       })
-      .catch(() => {}); // silently fall back to no colour-coding
+      .catch(() => setCalLoading(false));
   }, [property?.guestyId, calStart]);
 
   // ── Loading / not-found guards (all hooks above this line) ──
@@ -781,6 +799,7 @@ export default function PropertyPage() {
                     onPrev={prevCal}
                     onNext={nextCal}
                     dayStatuses={dayStatuses}
+                    loading={calLoading}
                   />
                   <CalendarMonth
                     year={calSecond.year}
@@ -790,20 +809,21 @@ export default function PropertyPage() {
                     onPrev={prevCal}
                     onNext={nextCal}
                     dayStatuses={dayStatuses}
+                    loading={calLoading}
                   />
                 </div>
-                <div className="flex items-center gap-6 mt-5 text-[13px] text-[#8A7968]">
+                <div className="flex items-center gap-5 mt-5 text-[13px] text-[#8A7968]">
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-sm bg-white border border-[#D0C8BD]" />
+                    <div className="w-4 h-4 rounded-sm bg-[#e8f5ec] border border-[#b7dfca]" />
                     <span>Available</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-sm bg-[#fde8e8]" />
-                    <span>Booked</span>
+                    <div className="w-4 h-4 rounded-sm bg-[#fde8e8] border border-[#f5c6c6]" />
+                    <span>Not available</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-sm bg-[#d4edda]" />
-                    <span>Test Available</span>
+                    <div className="w-4 h-4 rounded-sm bg-[#f0ebe3] border border-[#E0D8CE]" />
+                    <span>Past</span>
                   </div>
                 </div>
               </div>

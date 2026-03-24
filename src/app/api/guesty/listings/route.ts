@@ -5,7 +5,7 @@ import { getAllListings } from "@/lib/guesty";
  * GET /api/guesty/listings
  *
  * Returns all active Guesty listings (paginated internally).
- * Cached at the CDN layer for 10 minutes.
+ * In-memory cache: 1 hour (globalThis). CDN cache: 1 hour.
  */
 export const dynamic = "force-dynamic";
 
@@ -16,7 +16,8 @@ export async function GET() {
       { listings, total: listings.length },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=600, stale-while-revalidate=60",
+          // CDN caches for 1 hour; serves stale for up to 5 min while revalidating
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=300",
         },
       }
     );

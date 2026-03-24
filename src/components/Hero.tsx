@@ -66,7 +66,14 @@ export default function Hero() {
     <section className="relative h-screen min-h-[680px] overflow-hidden flex flex-col">
       {/* Background video */}
       <div className="absolute inset-0">
-        <video autoPlay muted loop playsInline className="w-full h-full object-cover object-center">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg"
+          className="w-full h-full object-cover object-center"
+        >
           <source src="/video/The-Cohost-Hero-Video-new-on-Vimeo-.mp4" type="video/mp4" />
         </video>
       </div>

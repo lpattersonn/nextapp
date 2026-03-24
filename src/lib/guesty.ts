@@ -569,8 +569,8 @@ export async function getAllListings(): Promise<GuestyListingFull[]> {
 
     const active = all.filter((l) => l.active !== false);
 
-    // Cache for 10 minutes
-    global.__guestyListings = { value: active, expiresAt: Date.now() + 10 * 60 * 1000 };
+    // Cache for 1 hour — listings/images are synced from Guesty once per hour
+    global.__guestyListings = { value: active, expiresAt: Date.now() + 60 * 60 * 1000 };
     global.__guestyListingsFlight = undefined;
     return active;
   };
