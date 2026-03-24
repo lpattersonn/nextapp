@@ -24,9 +24,10 @@ const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 const RETRYABLE_STATUSES = new Set([429, 502, 503, 504]);
 
 // ─── Token cache ──────────────────────────────────────────────────────────────
-// Stored on globalThis so it survives Next.js hot-reloads in development and
-// is shared across all concurrent requests in the same Node.js process,
-// preventing redundant /oauth2/token calls that trigger Guesty rate limits.
+// Layer 1: globalThis  — shared within the same Node.js process / Lambda warm reuse
+// Layer 2: /tmp file   — survives across warm Lambda invocations on the same host
+//                        (helps avoid 429s on Netlify where globalThis resets on cold starts)
+// Best practice: set GUESTY_API_KEY env var to skip OAuth entirely.
 declare global {
   // eslint-disable-next-line no-var
   var __guestyToken: { value: string; expiresAt: number } | undefined;
@@ -40,23 +41,52 @@ declare global {
   var __guestyListingById: Map<string, { value: GuestyListingFull; expiresAt: number }> | undefined;
 }
 
+// ─── /tmp disk token cache (helps on Netlify where globalThis resets on cold start) ───
+const DISK_TOKEN_PATH = "/tmp/.guesty_oauth_token";
+
+function readDiskToken(): { value: string; expiresAt: number } | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require("fs") as typeof import("fs");
+    if (fs.existsSync(DISK_TOKEN_PATH)) {
+      return JSON.parse(fs.readFileSync(DISK_TOKEN_PATH, "utf8"));
+    }
+  } catch {}
+  return null;
+}
+
+function writeDiskToken(t: { value: string; expiresAt: number }): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const fs = require("fs") as typeof import("fs");
+    fs.writeFileSync(DISK_TOKEN_PATH, JSON.stringify(t));
+  } catch {}
+}
+
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 async function getAccessToken(): Promise<string> {
-  // 1. Direct API key — no OAuth needed
+  // 1. Direct API key — no OAuth needed (recommended for production)
   const apiKey = process.env.GUESTY_API_KEY;
   if (apiKey) return apiKey;
 
-  // 2. Cached token still valid → return immediately
+  // 2. In-memory cache (same Lambda instance / hot reload)
   if (global.__guestyToken && Date.now() < global.__guestyToken.expiresAt) {
     return global.__guestyToken.value;
   }
 
-  // 3. In-flight request already running → join it (prevents concurrent token fetches)
+  // 3. Disk cache — survives warm Lambda reuse on Netlify even when globalThis was reset
+  const disk = readDiskToken();
+  if (disk && Date.now() < disk.expiresAt) {
+    global.__guestyToken = disk; // restore to memory cache
+    return disk.value;
+  }
+
+  // 4. In-flight request already running → join it (prevents concurrent token fetches)
   if (global.__guestyTokenFlight) {
     return global.__guestyTokenFlight;
   }
 
-  // 4. Fetch a fresh token (with retry for transient errors)
+  // 5. Fetch a fresh token (with retry for transient errors)
   const clientId = process.env.GUESTY_CLIENT_ID;
   const clientSecret = process.env.GUESTY_CLIENT_SECRET;
 
@@ -86,10 +116,12 @@ async function getAccessToken(): Promise<string> {
       if (res.ok) {
         const data = (await res.json()) as { access_token: string; expires_in: number };
         // Cache with a 5-minute buffer before actual expiry
-        global.__guestyToken = {
+        const tokenEntry = {
           value: data.access_token,
           expiresAt: Date.now() + Math.max(0, data.expires_in - 300) * 1000,
         };
+        global.__guestyToken = tokenEntry;
+        writeDiskToken(tokenEntry); // persist to /tmp for cross-invocation reuse
         global.__guestyTokenFlight = undefined;
         return data.access_token;
       }
