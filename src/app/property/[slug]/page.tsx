@@ -841,7 +841,7 @@ export default function PropertyPage() {
         }
         setCalLoading(false);
       })
-      .catch(() => setCalLoading(false));
+      .catch((err) => { console.error("[calendar]", err); setCalLoading(false); });
   }, [property?.guestyId, calStart]);
 
   // ── Loading / not-found guards (all hooks above this line) ──

@@ -15,6 +15,8 @@ import { getCalendarDays, GuestyAPIError } from "@/lib/guesty";
  * Used by the property-page calendar to colour-code available / booked days.
  * Response is cached for 10 minutes at the CDN / Next.js layer.
  */
+export const dynamic = "force-dynamic";
+
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const listingId = searchParams.get("listingId");

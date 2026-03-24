@@ -405,18 +405,30 @@ export async function getCalendarDays(
   endDate: string
 ): Promise<GuestyAvailabilityDay[]> {
   // Guesty Open API v1 calendar endpoint uses from/to params
-  const data = await guestyFetch<
-    | { days: GuestyAvailabilityDay[] }
-    | { data: GuestyAvailabilityDay[] }
-    | GuestyAvailabilityDay[]
-  >(`/listings/${listingId}/calendar?from=${startDate}&to=${endDate}`);
+  const data = await guestyFetch<unknown>(
+    `/listings/${listingId}/calendar?from=${startDate}&to=${endDate}`
+  );
 
   // Handle all response shapes Guesty may return
-  if (Array.isArray(data)) return data;
-  if ("days" in data && Array.isArray((data as { days: unknown }).days))
-    return (data as { days: GuestyAvailabilityDay[] }).days;
-  if ("data" in data && Array.isArray((data as { data: unknown }).data))
-    return (data as { data: GuestyAvailabilityDay[] }).data;
+  if (Array.isArray(data)) return data as GuestyAvailabilityDay[];
+
+  if (data && typeof data === "object") {
+    const d = data as Record<string, unknown>;
+    // { results: [...] }  — most common in Guesty v1
+    if (Array.isArray(d.results)) return d.results as GuestyAvailabilityDay[];
+    // { days: [...] }
+    if (Array.isArray(d.days)) return d.days as GuestyAvailabilityDay[];
+    // { data: [...] }
+    if (Array.isArray(d.data)) return d.data as GuestyAvailabilityDay[];
+    // { data: { results: [...] } }
+    if (d.data && typeof d.data === "object" && Array.isArray((d.data as Record<string, unknown>).results))
+      return (d.data as { results: GuestyAvailabilityDay[] }).results;
+    // { data: { days: [...] } }
+    if (d.data && typeof d.data === "object" && Array.isArray((d.data as Record<string, unknown>).days))
+      return (d.data as { days: GuestyAvailabilityDay[] }).days;
+  }
+
+  console.warn("[guesty/getCalendarDays] Unrecognised response shape:", JSON.stringify(data).slice(0, 300));
   return [];
 }
 
