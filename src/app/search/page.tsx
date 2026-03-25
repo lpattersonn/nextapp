@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -85,7 +85,7 @@ function StayCard({
   return (
     <Link
       href={`/property/${listing._id}`}
-      className={`block bg-white rounded-2xl overflow-hidden transition-shadow duration-300 ${highlighted ? "shadow-2xl ring-2 ring-[#7B5B3A]" : "shadow-sm hover:shadow-xl"}`}
+      className={`block bg-white rounded-2xl overflow-hidden transition-shadow duration-300 ${highlighted ? "shadow-xl" : "shadow-sm hover:shadow-xl"}`}
       onMouseEnter={() => onHover(listing._id)}
       onMouseLeave={() => onHover(null)}
     >
@@ -189,7 +189,7 @@ function SearchPageInner() {
   // Fetch listings + derive tag pills
   // Stale-while-revalidate: show cached listings immediately, fetch fresh data in background
   useEffect(() => {
-    const CACHE_KEY = "cohost_listings_v1";
+    const CACHE_KEY = "cohost_listings_v2";
 
     function applyListings(raw: GuestyListingFull[]) {
       setListings(raw);
@@ -222,7 +222,7 @@ function SearchPageInner() {
   }, []);
 
   // Filter + sort
-  const filtered = useCallback(() => {
+  const results = useMemo(() => {
     let result = listings;
 
     // Location filter
@@ -248,8 +248,6 @@ function SearchPageInner() {
     return sortListings(result, sort);
   }, [listings, location, guests, category, sort]);
 
-  const results = filtered();
-
   function handleSearch() {
     const p = new URLSearchParams({
       ...(location ? { location } : {}),
@@ -271,7 +269,7 @@ function SearchPageInner() {
 
       {/* ── TOP SEARCH BAR ── */}
       <div className="shrink-0 bg-white border-b border-[#EDE8DF] px-4 py-3 mt-[80px]">
-        <div className="max-w-[1400px] mx-auto flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap">
 
           {/* Location */}
           <label className="flex items-center gap-2 bg-[#F7F4EF] rounded-full px-4 py-2.5 flex-1 min-w-[160px] max-w-[220px] cursor-text">
@@ -420,7 +418,7 @@ function SearchPageInner() {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pb-4">
-                {results.map((l) => (
+                {results.map((l: GuestyListingFull) => (
                   <StayCard
                     key={l._id}
                     listing={l}

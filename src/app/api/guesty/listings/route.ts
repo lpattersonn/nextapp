@@ -12,12 +12,20 @@ import type { GuestyListingFull } from "@/lib/guesty";
  */
 export const dynamic = "force-dynamic";
 
+/** Remove everything up to and including the last " - " in a name.
+ *  e.g. "ALB · Cobalt - Alba" → "Alba" */
+function cleanName(raw: string): string {
+  const idx = raw.lastIndexOf(" - ");
+  return idx !== -1 ? raw.slice(idx + 3).trim() : raw.trim();
+}
+
 /** Strip each listing down to only what property cards need. */
 function trimForCard(l: GuestyListingFull) {
+  const rawName = l.nickname || l.title;
   return {
     _id:          l._id,
-    title:        l.title,
-    nickname:     l.nickname,
+    title:        cleanName(l.title),
+    nickname:     cleanName(rawName),
     accommodates: l.accommodates,
     bedrooms:     l.bedrooms,
     bathrooms:    l.bathrooms,

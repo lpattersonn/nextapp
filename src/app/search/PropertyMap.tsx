@@ -265,19 +265,20 @@ export default function PropertyMap({ listings, hoveredId, onHover }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef        = useRef<any>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const leafletRef    = useRef<any>(null); // cached module — import once
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markersRef    = useRef<Map<string, any>>(new Map());
   const listingsRef   = useRef(listings);
-  const hoveredIdRef  = useRef(hoveredId);
+  const prevHoveredRef = useRef<string | null>(null);
 
-  // Keep refs current for the zoom event listener
-  useEffect(() => { listingsRef.current  = listings;  }, [listings]);
-  useEffect(() => { hoveredIdRef.current = hoveredId; }, [hoveredId]);
+  useEffect(() => { listingsRef.current = listings; }, [listings]);
 
-  // Initialise map once
+  // Initialise map once and cache the Leaflet module
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
 
     import("leaflet").then((L) => {
+      leafletRef.current = L;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
@@ -300,13 +301,14 @@ export default function PropertyMap({ listings, hoveredId, onHover }: Props) {
       L.control.zoom({ position: "topright" }).addTo(map);
       mapRef.current = map;
 
-      addMarkers(L, map, listingsRef.current, hoveredIdRef.current, onHover, markersRef);
+      addMarkers(L, map, listingsRef.current, null, onHover, markersRef);
 
-      // Re-cluster on every zoom change
+      // Re-cluster on zoom — only full rebuild needed here
       map.on("zoomend", () => {
         markersRef.current.forEach((m) => m.remove());
         markersRef.current.clear();
-        addMarkers(L, map, listingsRef.current, hoveredIdRef.current, onHover, markersRef);
+        addMarkers(L, map, listingsRef.current, null, onHover, markersRef);
+        prevHoveredRef.current = null;
       });
     });
 
@@ -320,16 +322,38 @@ export default function PropertyMap({ listings, hoveredId, onHover }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Re-render markers when listings or hover state changes
+  // Full marker rebuild only when listings change (not on hover)
   useEffect(() => {
-    if (!mapRef.current) return;
-    import("leaflet").then((L) => {
-      markersRef.current.forEach((m) => m.remove());
-      markersRef.current.clear();
-      addMarkers(L, mapRef.current, listings, hoveredId, onHover, markersRef);
-    });
+    const L = leafletRef.current;
+    if (!mapRef.current || !L) return;
+    markersRef.current.forEach((m) => m.remove());
+    markersRef.current.clear();
+    addMarkers(L, mapRef.current, listings, null, onHover, markersRef);
+    prevHoveredRef.current = null;
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listings, hoveredId]);
+  }, [listings]);
+
+  // Hover: only update the two affected markers — no full rebuild
+  useEffect(() => {
+    const L = leafletRef.current;
+    if (!mapRef.current || !L) return;
+
+    const update = (id: string | null, hovered: boolean) => {
+      if (!id) return;
+      const marker = markersRef.current.get(id);
+      if (!marker) return;
+      const l = listingsRef.current.find((x) => x._id === id);
+      if (!l) return;
+      const price = l.prices?.basePrice;
+      const label = price && price > 0 ? `$${price.toLocaleString()}` : "–";
+      marker.setIcon(L.divIcon({ className: "", html: singlePinHtml(label, hovered), iconAnchor: [30, 34] }));
+      marker.setZIndexOffset(hovered ? 1000 : 0);
+    };
+
+    update(prevHoveredRef.current, false);
+    update(hoveredId, true);
+    prevHoveredRef.current = hoveredId;
+  }, [hoveredId]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 }
