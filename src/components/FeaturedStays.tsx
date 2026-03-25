@@ -36,7 +36,7 @@ function StayCard({ stay }: { stay: Stay }) {
           alt={stay.name}
           fill
           className="object-cover transition-opacity duration-300"
-          unoptimized
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
         {stay.badge && (

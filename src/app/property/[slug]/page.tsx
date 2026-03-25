@@ -123,7 +123,7 @@ function PhotoGrid({ images, name, openRef }: {
             fill
             priority
             className="object-cover"
-            unoptimized
+            sizes="100vw"
           />
           {/* Prev */}
           <button
@@ -159,7 +159,7 @@ function PhotoGrid({ images, name, openRef }: {
           style={{ gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "1fr 1fr", height: "clamp(280px, 45vw, 480px)" }}
         >
           <div className="row-span-2 relative cursor-pointer overflow-hidden group" onClick={() => open(0)}>
-            <Image src={main} alt={name} fill priority className="object-cover group-hover:brightness-95 transition duration-300" unoptimized />
+            <Image src={main} alt={name} fill priority className="object-cover group-hover:brightness-95 transition duration-300" sizes="(max-width: 1200px) 66vw, 746px" />
           </div>
           {filled.map((img, i) => (
             <div key={i} className="relative cursor-pointer overflow-hidden group" onClick={() => open(i + 1)}>

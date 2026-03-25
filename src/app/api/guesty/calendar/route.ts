@@ -52,12 +52,23 @@ export async function GET(req: NextRequest) {
   try {
     const days = await getCalendarDays(listingId, startDate, endDate);
 
+    // Log a sample so we can verify the status values Guesty is returning
+    if (days.length > 0) {
+      const sample = days.slice(0, 3).map(d => `${d.date}=${d.status}`).join(", ");
+      const counts = days.reduce((acc, d) => { acc[d.status] = (acc[d.status] ?? 0) + 1; return acc; }, {} as Record<string, number>);
+      console.log(`[guesty/calendar] ${days.length} days — sample: ${sample} — counts:`, JSON.stringify(counts));
+    } else {
+      console.log("[guesty/calendar] 0 days returned");
+    }
+
     return NextResponse.json(
       { days },
       {
         headers: {
           // Cache at CDN for 10 minutes; allow stale for an extra 30 s while revalidating
           "Cache-Control": "public, s-maxage=600, stale-while-revalidate=30",
+          // Tag this response so the Guesty webhook can purge it instantly on new reservations
+          "Netlify-Cache-Tag": `calendar-${listingId}`,
         },
       }
     );

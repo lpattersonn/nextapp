@@ -79,7 +79,7 @@ function StayCard({
     >
       <div className="relative h-[220px] group overflow-hidden bg-[#EDE8DF]">
         {images.length > 0 ? (
-          <Image src={images[current]} alt={name} fill className="object-cover transition-opacity duration-300" unoptimized />
+          <Image src={images[current]} alt={name} fill className="object-cover transition-opacity duration-300" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
         ) : (
           <div className="w-full h-full bg-[#D4C9BC] flex items-center justify-center">
             <ImageOff size={32} color="#9A8A7A" strokeWidth={1.5} />
@@ -176,21 +176,43 @@ function SearchPageInner() {
   }, []);
 
   // Fetch listings + derive tag pills
+  // Stale-while-revalidate: show cached listings immediately, fetch fresh data in background
   useEffect(() => {
+    const CACHE_KEY = "cohost_listings_v1";
+
+    function applyListings(raw: GuestyListingFull[]) {
+      setListings(raw);
+      const seen = new Set<string>();
+      for (const l of raw) {
+        for (const t of (l.tags ?? [])) {
+          if (t) seen.add(t);
+        }
+      }
+      setTagPills(["Featured", ...Array.from(seen).sort()]);
+    }
+
+    // 1. Show cached data instantly if available (< 1 hour old)
+    try {
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const { listings: raw, ts } = JSON.parse(cached) as { listings: GuestyListingFull[]; ts: number };
+        if (Date.now() - ts < 3_600_000) {
+          applyListings(raw);
+          setLoading(false);
+        }
+      }
+    } catch {}
+
+    // 2. Always fetch fresh data in the background
     fetch("/api/guesty/listings")
       .then((r) => r.ok ? r.json() : Promise.reject())
       .then((data) => {
         const raw: GuestyListingFull[] = data.listings ?? [];
-        setListings(raw);
-        // Collect unique tags across all listings, sorted alphabetically
-        const seen = new Set<string>();
-        for (const l of raw) {
-          for (const t of (l.tags ?? [])) {
-            if (t) seen.add(t);
-          }
-        }
-        setTagPills(["Featured", ...Array.from(seen).sort()]);
+        applyListings(raw);
         setLoading(false);
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ listings: raw, ts: Date.now() }));
+        } catch {}
       })
       .catch(() => setLoading(false));
   }, []);

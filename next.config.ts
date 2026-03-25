@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "thecohostcompany.com" },
       // Guesty Cloudinary CDN — all paths allowed
       { protocol: "https", hostname: "assets.guesty.com", pathname: "/**" },
+      // Cloudinary (Guesty property photos are served from here)
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
     ],
   },
   // Compress responses
