@@ -9,7 +9,19 @@ import type { GuestyListingFull } from "@/lib/guesty";
 import {
   MapPin, CalendarDays, Users, ChevronLeft, ChevronRight,
   SlidersHorizontal, Search, RotateCcw, BedDouble, Bath, ImageOff,
+  Star, Heart, Waves, Mountain, Gem, Crown,
 } from "lucide-react";
+
+type CategoryIcon = React.ComponentType<{ size?: number; strokeWidth?: number }>;
+
+const CATEGORIES: { label: string; Icon: CategoryIcon }[] = [
+  { label: "Featured",         Icon: Star },
+  { label: "Romantic Retreat", Icon: Heart },
+  { label: "Pool",             Icon: Waves },
+  { label: "Boulders",         Icon: Mountain },
+  { label: "Unique",           Icon: Gem },
+  { label: "Luxury",           Icon: Crown },
+];
 
 // Leaflet map — dynamic import (no SSR) because Leaflet requires window
 const PropertyMap = dynamic(() => import("./PropertyMap"), { ssr: false });
@@ -73,7 +85,7 @@ function StayCard({
   return (
     <Link
       href={`/property/${listing._id}`}
-      className={`block bg-white rounded-2xl overflow-hidden transition-all duration-300 ${highlighted ? "shadow-2xl ring-2 ring-[#7B5B3A]" : "shadow-sm hover:shadow-xl"}`}
+      className={`block bg-white rounded-2xl overflow-hidden transition-shadow duration-300 ${highlighted ? "shadow-2xl ring-2 ring-[#7B5B3A]" : "shadow-sm hover:shadow-xl"}`}
       onMouseEnter={() => onHover(listing._id)}
       onMouseLeave={() => onHover(null)}
     >
@@ -100,7 +112,7 @@ function StayCard({
         <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
           {images.slice(0, 5).map((_, i) => (
             <button key={i} onClick={(e) => { e.preventDefault(); setCurrent(i); }}
-              className={`rounded-full transition-all duration-200 cursor-pointer ${i === current ? "w-2 h-2 bg-white" : "w-1.5 h-1.5 bg-white/55"}`} />
+              className={`rounded-full transition-[width,height,background-color] duration-200 cursor-pointer ${i === current ? "w-2 h-2 bg-white" : "w-1.5 h-1.5 bg-white/55"}`} />
           ))}
         </div>
       </div>
@@ -154,7 +166,6 @@ function SearchPageInner() {
   const [loading, setLoading]     = useState(true);
   const [category, setCategory]   = useState("Featured");
   const [sort, setSort]           = useState<SortKey>("featured");
-  const [tagPills, setTagPills]   = useState<string[]>(["Featured"]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const today  = new Date().toISOString().split("T")[0];
@@ -182,13 +193,6 @@ function SearchPageInner() {
 
     function applyListings(raw: GuestyListingFull[]) {
       setListings(raw);
-      const seen = new Set<string>();
-      for (const l of raw) {
-        for (const t of (l.tags ?? [])) {
-          if (t) seen.add(t);
-        }
-      }
-      setTagPills(["Featured", ...Array.from(seen).sort()]);
     }
 
     // 1. Show cached data instantly if available (< 1 hour old)
@@ -339,19 +343,20 @@ function SearchPageInner() {
           </button>
         </div>
 
-        {/* Category pills — derived from real Guesty listing tags */}
-        <div className="max-w-[1400px] mx-auto flex items-center gap-3 mt-3 overflow-x-auto pb-1 scrollbar-hide">
-          {tagPills.map((tag) => (
+        {/* Category tabs — icon + label inline, underline on active */}
+        <div className="max-w-[1400px] mx-auto flex items-center overflow-x-auto scrollbar-hide border-b border-[#EDE8DF]">
+          {CATEGORIES.map(({ label, Icon }) => (
             <button
-              key={tag}
-              onClick={() => setCategory(tag)}
-              className={`flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[13px] font-medium whitespace-nowrap transition-all cursor-pointer shrink-0 ${
-                category === tag
-                  ? "bg-[#1C1410] text-white"
-                  : "bg-[#F7F4EF] text-[#5A4A3A] hover:bg-[#EDE8DF]"
+              key={label}
+              onClick={() => setCategory(label)}
+              className={`flex items-center gap-2 px-5 py-3 text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 border-b-2 -mb-px ${
+                category === label
+                  ? "border-[#1C1410] text-[#1C1410]"
+                  : "border-transparent text-[#8A7968] hover:text-[#1C1410] hover:border-[#C4A882]"
               }`}
             >
-              {tag}
+              <Icon size={18} strokeWidth={1.5} />
+              {label}
             </button>
           ))}
         </div>

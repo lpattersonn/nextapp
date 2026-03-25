@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import "leaflet/dist/leaflet.css";
 import type { GuestyListingFull } from "@/lib/guesty";
 
 function cityKey(l: GuestyListingFull) {
@@ -330,10 +331,5 @@ export default function PropertyMap({ listings, hoveredId, onHover }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listings, hoveredId]);
 
-  return (
-    <>
-      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-      <div ref={containerRef} className="w-full h-full" />
-    </>
-  );
+  return <div ref={containerRef} className="w-full h-full" />;
 }

@@ -35,6 +35,8 @@ function trimForCard(l: GuestyListingFull) {
       thumbnail: p.thumbnail,
     })),
     tags: l.tags ?? [],
+    // First 30 amenities — enough for filter matching without bloating the payload
+    amenities: (l.amenities ?? []).slice(0, 30),
   };
 }
 
