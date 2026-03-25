@@ -14,13 +14,13 @@ import {
 
 type CategoryIcon = React.ComponentType<{ size?: number; strokeWidth?: number }>;
 
-const CATEGORIES: { label: string; Icon: CategoryIcon }[] = [
-  { label: "Featured",         Icon: Star },
-  { label: "Romantic Retreat", Icon: Heart },
-  { label: "Pool",             Icon: Waves },
-  { label: "Boulders",         Icon: Mountain },
-  { label: "Unique",           Icon: Gem },
-  { label: "Luxury",           Icon: Crown },
+const CATEGORIES: { label: string; tag: string; Icon: CategoryIcon }[] = [
+  { label: "Featured",         tag: "Featured",      Icon: Star },
+  { label: "Romantic Retreat", tag: "Romantic Retreat", Icon: Heart },
+  { label: "Pool",             tag: "Pool",          Icon: Waves },
+  { label: "Boulders",         tag: "Boulders",      Icon: Mountain },
+  { label: "Unique",           tag: "Unique(to-do)", Icon: Gem },
+  { label: "Luxury",           tag: "Luxury(to-do)", Icon: Crown },
 ];
 
 // Leaflet map — dynamic import (no SSR) because Leaflet requires window
@@ -238,9 +238,11 @@ function SearchPageInner() {
     // Guest filter
     if (guests > 1) result = result.filter((l) => (l.accommodates ?? 0) >= guests);
 
-    // Category filter — match against Guesty listing tags
+    // Category filter — match against Guesty listing tags (using actual tag name)
     if (category !== "Featured") {
-      result = result.filter((l) => (l.tags ?? []).includes(category));
+      const cat = CATEGORIES.find((c) => c.label === category);
+      const tag = cat?.tag ?? category;
+      result = result.filter((l) => (l.tags ?? []).includes(tag));
     }
 
     return sortListings(result, sort);
@@ -343,22 +345,24 @@ function SearchPageInner() {
           </button>
         </div>
 
-        {/* Category tabs — icon + label inline, underline on active */}
-        <div className="max-w-[1400px] mx-auto flex items-center overflow-x-auto scrollbar-hide border-b border-[#EDE8DF]">
-          {CATEGORIES.map(({ label, Icon }) => (
-            <button
-              key={label}
-              onClick={() => setCategory(label)}
-              className={`flex items-center gap-2 px-5 py-3 text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 border-b-2 -mb-px ${
-                category === label
-                  ? "border-[#1C1410] text-[#1C1410]"
-                  : "border-transparent text-[#8A7968] hover:text-[#1C1410] hover:border-[#C4A882]"
-              }`}
-            >
-              <Icon size={18} strokeWidth={1.5} />
-              {label}
-            </button>
-          ))}
+        {/* Category tabs — horizontally scrollable on mobile */}
+        <div className="border-b border-[#EDE8DF] overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex items-center min-w-max sm:min-w-0">
+            {CATEGORIES.map(({ label, Icon }) => (
+              <button
+                key={label}
+                onClick={() => setCategory(label)}
+                className={`flex items-center gap-2 px-4 sm:px-5 py-3 text-[13px] font-medium whitespace-nowrap transition-colors cursor-pointer shrink-0 border-b-2 -mb-px ${
+                  category === label
+                    ? "border-[#1C1410] text-[#1C1410]"
+                    : "border-transparent text-[#8A7968] hover:text-[#1C1410] hover:border-[#C4A882]"
+                }`}
+              >
+                <Icon size={18} strokeWidth={1.5} />
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
