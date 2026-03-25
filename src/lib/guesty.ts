@@ -9,7 +9,7 @@
  * Other env vars:
  *   GUESTY_BASE_URL            — defaults to https://open-api.guesty.com/v1
  */
-import { unstable_cache } from "next/cache";
+import { getStore } from "@netlify/blobs";
 
 const BASE_URL =
   (process.env.GUESTY_BASE_URL ?? "https://open-api.guesty.com/v1").replace(
@@ -40,31 +40,34 @@ declare global {
   var __guestyListingById: Map<string, { value: GuestyListingFull; expiresAt: number }> | undefined;
 }
 
-// ─── Cached OAuth token fetch ─────────────────────────────────────────────────
-// unstable_cache is Next.js's data cache — the Netlify Next.js plugin persists
-// it across Lambda invocations, so all instances share one token per 24 hours.
-const fetchOAuthTokenCached = unstable_cache(
-  async (clientId: string, clientSecret: string) => {
-    const res = await fetch(TOKEN_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        grant_type: "client_credentials",
-        client_id: clientId,
-        client_secret: clientSecret,
-        scope: "open-api",
-      }),
-    });
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`Guesty auth failed (${res.status}): ${text}`);
+// ─── Netlify Blobs token cache ────────────────────────────────────────────────
+// Persists across deployments and all Lambda instances — solves the serverless
+// cold-start 429 problem. Errors are logged but never fatal (falls back to direct OAuth).
+async function blobReadToken(): Promise<{ value: string; expiresAt: number } | null> {
+  try {
+    const store = getStore("guesty-auth");
+    const entry = await store.get("token", { type: "json" }) as { value: string; expiresAt: number } | null;
+    if (entry && Date.now() < entry.expiresAt) {
+      console.log("[guesty/blobs] token cache hit");
+      return entry;
     }
-    const data = (await res.json()) as { access_token: string; expires_in: number };
-    return { token: data.access_token, expiresIn: data.expires_in };
-  },
-  ["guesty-oauth-token"],
-  { revalidate: 82800 } // revalidate after 23 h (token lasts 24 h)
-);
+    console.log("[guesty/blobs] token cache miss (empty or expired)");
+    return null;
+  } catch (err) {
+    console.error("[guesty/blobs] read error:", String(err));
+    return null;
+  }
+}
+
+async function blobWriteToken(value: string, expiresAt: number): Promise<void> {
+  try {
+    const store = getStore("guesty-auth");
+    await store.set("token", JSON.stringify({ value, expiresAt }));
+    console.log("[guesty/blobs] token cached until", new Date(expiresAt).toISOString());
+  } catch (err) {
+    console.error("[guesty/blobs] write error:", String(err));
+  }
+}
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 async function getAccessToken(): Promise<string> {
@@ -91,17 +94,43 @@ async function getAccessToken(): Promise<string> {
     );
   }
 
-  // 4. unstable_cache — Next.js data cache shared across all Lambda instances on Netlify.
-  //    Only one OAuth call per 23-hour window regardless of how many cold starts occur.
+  // 4. Netlify Blobs — shared across ALL Lambda instances, persists across deployments.
+  //    This is the primary cold-start fix: one OAuth call per 24 hours site-wide.
   global.__guestyTokenFlight = (async () => {
     try {
-      const { token, expiresIn } = await fetchOAuthTokenCached(clientId, clientSecret);
-      const entry = {
-        value: token,
-        expiresAt: Date.now() + Math.max(0, expiresIn - 300) * 1000,
-      };
+      // Check Blobs before calling Guesty OAuth
+      const blob = await blobReadToken();
+      if (blob) {
+        global.__guestyToken = blob;
+        return blob.value;
+      }
+
+      // Fetch a fresh token from Guesty
+      console.log("[guesty/auth] fetching fresh OAuth token");
+      const res = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          grant_type: "client_credentials",
+          client_id: clientId,
+          client_secret: clientSecret,
+          scope: "open-api",
+        }),
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new GuestyAPIError(`Guesty auth failed (${res.status}): ${text}`, res.status, "/oauth2/token");
+      }
+
+      const data = (await res.json()) as { access_token: string; expires_in: number };
+      const expiresAt = Date.now() + Math.max(0, data.expires_in - 300) * 1000;
+      const entry = { value: data.access_token, expiresAt };
+
       global.__guestyToken = entry;
-      return token;
+      await blobWriteToken(entry.value, entry.expiresAt); // store in Blobs for other instances
+      return entry.value;
     } finally {
       global.__guestyTokenFlight = undefined;
     }
