@@ -9,6 +9,7 @@
  * Other env vars:
  *   GUESTY_BASE_URL            — defaults to https://open-api.guesty.com/v1
  */
+import { getStore } from "@netlify/blobs";
 
 const BASE_URL =
   (process.env.GUESTY_BASE_URL ?? "https://open-api.guesty.com/v1").replace(
@@ -41,26 +42,29 @@ declare global {
   var __guestyListingById: Map<string, { value: GuestyListingFull; expiresAt: number }> | undefined;
 }
 
-// ─── /tmp disk token cache (helps on Netlify where globalThis resets on cold start) ───
-const DISK_TOKEN_PATH = "/tmp/.guesty_oauth_token";
+// ─── Netlify Blobs token cache ────────────────────────────────────────────────
+// Persists the OAuth token across all Lambda instances so every cold-start can
+// reuse the same token instead of hitting Guesty's OAuth endpoint repeatedly.
+// Falls back silently if Blobs is unavailable (local dev, non-Netlify deploys).
+const BLOBS_STORE = "guesty-auth";
+const BLOBS_KEY   = "oauth-token";
 
-function readDiskToken(): { value: string; expiresAt: number } | null {
+async function readBlobToken(): Promise<{ value: string; expiresAt: number } | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const fs = require("fs") as typeof import("fs");
-    if (fs.existsSync(DISK_TOKEN_PATH)) {
-      return JSON.parse(fs.readFileSync(DISK_TOKEN_PATH, "utf8"));
-    }
-  } catch {}
-  return null;
+    const store = getStore(BLOBS_STORE);
+    return await store.get(BLOBS_KEY, { type: "json" });
+  } catch {
+    return null;
+  }
 }
 
-function writeDiskToken(t: { value: string; expiresAt: number }): void {
+async function writeBlobToken(t: { value: string; expiresAt: number }): Promise<void> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const fs = require("fs") as typeof import("fs");
-    fs.writeFileSync(DISK_TOKEN_PATH, JSON.stringify(t));
-  } catch {}
+    const store = getStore(BLOBS_STORE);
+    await store.set(BLOBS_KEY, JSON.stringify(t));
+  } catch {
+    // non-fatal — in-memory cache still works
+  }
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -74,11 +78,11 @@ async function getAccessToken(): Promise<string> {
     return global.__guestyToken.value;
   }
 
-  // 3. Disk cache — survives warm Lambda reuse on Netlify even when globalThis was reset
-  const disk = readDiskToken();
-  if (disk && Date.now() < disk.expiresAt) {
-    global.__guestyToken = disk; // restore to memory cache
-    return disk.value;
+  // 3. Netlify Blobs — shared across ALL Lambda instances, survives cold starts
+  const blob = await readBlobToken();
+  if (blob && Date.now() < blob.expiresAt) {
+    global.__guestyToken = blob; // also restore to in-memory for this instance
+    return blob.value;
   }
 
   // 4. In-flight request already running → join it (prevents concurrent token fetches)
@@ -121,7 +125,7 @@ async function getAccessToken(): Promise<string> {
           expiresAt: Date.now() + Math.max(0, data.expires_in - 300) * 1000,
         };
         global.__guestyToken = tokenEntry;
-        writeDiskToken(tokenEntry); // persist to /tmp for cross-invocation reuse
+        writeBlobToken(tokenEntry); // persist to Netlify Blobs for cross-instance reuse
         global.__guestyTokenFlight = undefined;
         return data.access_token;
       }
