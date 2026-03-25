@@ -40,18 +40,22 @@ declare global {
   var __guestyListingById: Map<string, { value: GuestyListingFull; expiresAt: number }> | undefined;
 }
 
-// ─── Netlify Blobs token cache ────────────────────────────────────────────────
-// Persists across deployments and all Lambda instances — solves the serverless
-// cold-start 429 problem. Errors are logged but never fatal (falls back to direct OAuth).
+// ─── Netlify Blobs: shared token + rate-limit backoff ─────────────────────────
+// All Lambda instances share state via Blobs so they coordinate instead of
+// each independently hammering Guesty's OAuth endpoint.
+
+function getGuestyStore() {
+  return getStore("guesty-auth");
+}
+
 async function blobReadToken(): Promise<{ value: string; expiresAt: number } | null> {
   try {
-    const store = getStore("guesty-auth");
-    const entry = await store.get("token", { type: "json" }) as { value: string; expiresAt: number } | null;
+    const entry = await getGuestyStore().get("token", { type: "json" }) as { value: string; expiresAt: number } | null;
     if (entry && Date.now() < entry.expiresAt) {
       console.log("[guesty/blobs] token cache hit");
       return entry;
     }
-    console.log("[guesty/blobs] token cache miss (empty or expired)");
+    console.log("[guesty/blobs] token cache miss");
     return null;
   } catch (err) {
     console.error("[guesty/blobs] read error:", String(err));
@@ -61,11 +65,35 @@ async function blobReadToken(): Promise<{ value: string; expiresAt: number } | n
 
 async function blobWriteToken(value: string, expiresAt: number): Promise<void> {
   try {
-    const store = getStore("guesty-auth");
-    await store.set("token", JSON.stringify({ value, expiresAt }));
+    await getGuestyStore().set("token", JSON.stringify({ value, expiresAt }));
     console.log("[guesty/blobs] token cached until", new Date(expiresAt).toISOString());
   } catch (err) {
     console.error("[guesty/blobs] write error:", String(err));
+  }
+}
+
+// Backoff key: all instances read this before attempting OAuth.
+// If set, they skip the OAuth call entirely and fail fast.
+async function blobIsBackingOff(): Promise<boolean> {
+  try {
+    const raw = await getGuestyStore().get("backoff", { type: "json" }) as { until: number } | null;
+    if (raw && Date.now() < raw.until) {
+      console.log("[guesty/blobs] in rate-limit backoff until", new Date(raw.until).toISOString());
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+async function blobSetBackoff(durationMs: number): Promise<void> {
+  try {
+    const until = Date.now() + durationMs;
+    await getGuestyStore().set("backoff", JSON.stringify({ until }));
+    console.log("[guesty/blobs] backoff set for", Math.round(durationMs / 1000), "seconds");
+  } catch (err) {
+    console.error("[guesty/blobs] backoff write error:", String(err));
   }
 }
 
@@ -94,63 +122,46 @@ async function getAccessToken(): Promise<string> {
     );
   }
 
-  // 4. Netlify Blobs — shared across ALL Lambda instances, persists across deployments.
+  // 4. Netlify Blobs — token + distributed backoff shared across all Lambda instances.
   global.__guestyTokenFlight = (async () => {
     try {
-      // Check Blobs before calling Guesty OAuth
+      // Re-check Blobs (another instance racing this one may have already stored a token)
       const blob = await blobReadToken();
-      if (blob) {
-        global.__guestyToken = blob;
-        return blob.value;
+      if (blob) { global.__guestyToken = blob; return blob.value; }
+
+      // If a previous instance was rate-limited recently, don't pile on — fail fast
+      if (await blobIsBackingOff()) {
+        throw new GuestyAPIError("Guesty OAuth rate-limited — backing off", 429, "/oauth2/token");
       }
 
-      // Fetch a fresh token — on 429 wait and re-check Blobs (another instance may succeed first)
       console.log("[guesty/auth] fetching fresh OAuth token");
-      const retryDelays = [0, 8_000, 20_000]; // 0s, 8s, 20s between attempts
-      let lastErr: Error | null = null;
+      const res = await fetch(TOKEN_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          grant_type: "client_credentials",
+          client_id: clientId,
+          client_secret: clientSecret,
+          scope: "open-api",
+        }),
+        cache: "no-store",
+      });
 
-      for (let attempt = 0; attempt < retryDelays.length; attempt++) {
-        if (attempt > 0) {
-          console.log(`[guesty/auth] waiting ${retryDelays[attempt]}ms before retry ${attempt}`);
-          await sleep(retryDelays[attempt]);
-          // Another instance may have cached the token while we waited
-          const blobRetry = await blobReadToken();
-          if (blobRetry) {
-            console.log("[guesty/auth] found token in Blobs after wait");
-            global.__guestyToken = blobRetry;
-            return blobRetry.value;
-          }
-        }
-
-        const res = await fetch(TOKEN_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          body: new URLSearchParams({
-            grant_type: "client_credentials",
-            client_id: clientId,
-            client_secret: clientSecret,
-            scope: "open-api",
-          }),
-          cache: "no-store",
-        });
-
-        if (res.ok) {
-          const data = (await res.json()) as { access_token: string; expires_in: number };
-          const expiresAt = Date.now() + Math.max(0, data.expires_in - 300) * 1000;
-          const entry = { value: data.access_token, expiresAt };
-          global.__guestyToken = entry;
-          await blobWriteToken(entry.value, entry.expiresAt);
-          return entry.value;
-        }
-
-        const text = await res.text();
-        lastErr = new GuestyAPIError(`Guesty auth failed (${res.status}): ${text}`, res.status, "/oauth2/token");
-        console.error(`[guesty/auth] attempt ${attempt + 1} failed:`, lastErr.message);
-
-        if (res.status !== 429) break; // only retry on rate limit
+      if (res.ok) {
+        const data = (await res.json()) as { access_token: string; expires_in: number };
+        const expiresAt = Date.now() + Math.max(0, data.expires_in - 300) * 1000;
+        const entry = { value: data.access_token, expiresAt };
+        global.__guestyToken = entry;
+        await blobWriteToken(entry.value, entry.expiresAt);
+        return entry.value;
       }
 
-      throw lastErr!;
+      const text = await res.text();
+      if (res.status === 429) {
+        // Block ALL instances from retrying for 2 minutes — lets Guesty rate limit recover
+        await blobSetBackoff(120_000);
+      }
+      throw new GuestyAPIError(`Guesty auth failed (${res.status}): ${text}`, res.status, "/oauth2/token");
     } finally {
       global.__guestyTokenFlight = undefined;
     }
