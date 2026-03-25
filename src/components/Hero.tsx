@@ -28,6 +28,49 @@ function fmt(iso: string) {
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
+/** Defers video download until after first user interaction or page idle.
+ *  Poster image is shown immediately — no layout shift, no blocked paint. */
+function LazyVideo({ src, poster }: { src: string; poster: string }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = videoRef.current;
+    if (!el) return;
+
+    // Start loading video once the browser is idle (after critical resources)
+    const load = () => {
+      el.preload = "auto";
+      el.load();
+      el.play().catch(() => {});
+    };
+
+    if ("requestIdleCallback" in window) {
+      const id = requestIdleCallback(load, { timeout: 3000 });
+      return () => cancelIdleCallback(id);
+    } else {
+      const t = setTimeout(load, 2000);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  return (
+    <video
+      ref={videoRef}
+      muted
+      loop
+      playsInline
+      preload="none"
+      poster={poster}
+      onCanPlay={() => setVisible(true)}
+      className="w-full h-full object-cover object-center transition-opacity duration-700"
+      style={{ opacity: visible ? 1 : 0 }}
+    >
+      <source src={src} type="video/mp4" />
+    </video>
+  );
+}
+
 export default function Hero() {
   const router = useRouter();
   const [location, setLocation] = useState("");
@@ -35,24 +78,8 @@ export default function Hero() {
   const [checkOut, setCheckOut] = useState("");
   const [guests, setGuests] = useState(2);
   const [datesOpen, setDatesOpen] = useState(false);
-  const [locationOptions, setLocationOptions] = useState<string[]>([]);
+  const locationOptions = ["Joshua Tree", "Pioneertown", "Twentynine Palms", "Yucca Valley"];
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Pull real listing locations from the API
-  useEffect(() => {
-    fetch("/api/guesty/listings")
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => {
-        const seen = new Set<string>();
-        const cities: string[] = [];
-        for (const l of (data?.listings ?? [])) {
-          const c = normalizeCity(l.address?.city ?? "");
-          if (c && !seen.has(c)) { seen.add(c); cities.push(c); }
-        }
-        if (cities.length) setLocationOptions(cities.sort());
-      })
-      .catch(() => {});
-  }, []);
 
   const today = new Date().toISOString().split("T")[0];
   const minOut = checkIn
@@ -89,18 +116,12 @@ export default function Hero() {
 
   return (
     <section className="relative h-[100svh] min-h-[680px] overflow-hidden flex flex-col">
-      {/* Background video */}
+      {/* Background video — poster loads instantly; video deferred until page is idle */}
       <div className="absolute inset-0">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
+        <LazyVideo
+          src="/video/hero.mp4"
           poster="https://assets.guesty.com/image/upload/w_1200,q_auto,f_auto/v1767380085/production/68df18d0ea1895d9005ea6ad/pexzqqzgr8xsj1cdn2ry.jpg"
-          className="w-full h-full object-cover object-center"
-        >
-          <source src="/video/The-Cohost-Hero-Video-new-on-Vimeo-.mp4" type="video/mp4" />
-        </video>
+        />
       </div>
 
       {/* Overlay */}
