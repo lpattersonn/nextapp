@@ -95,7 +95,6 @@ async function getAccessToken(): Promise<string> {
   }
 
   // 4. Netlify Blobs — shared across ALL Lambda instances, persists across deployments.
-  //    This is the primary cold-start fix: one OAuth call per 24 hours site-wide.
   global.__guestyTokenFlight = (async () => {
     try {
       // Check Blobs before calling Guesty OAuth
@@ -105,32 +104,53 @@ async function getAccessToken(): Promise<string> {
         return blob.value;
       }
 
-      // Fetch a fresh token from Guesty
+      // Fetch a fresh token — on 429 wait and re-check Blobs (another instance may succeed first)
       console.log("[guesty/auth] fetching fresh OAuth token");
-      const res = await fetch(TOKEN_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
-          grant_type: "client_credentials",
-          client_id: clientId,
-          client_secret: clientSecret,
-          scope: "open-api",
-        }),
-        cache: "no-store",
-      });
+      const retryDelays = [0, 8_000, 20_000]; // 0s, 8s, 20s between attempts
+      let lastErr: Error | null = null;
 
-      if (!res.ok) {
+      for (let attempt = 0; attempt < retryDelays.length; attempt++) {
+        if (attempt > 0) {
+          console.log(`[guesty/auth] waiting ${retryDelays[attempt]}ms before retry ${attempt}`);
+          await sleep(retryDelays[attempt]);
+          // Another instance may have cached the token while we waited
+          const blobRetry = await blobReadToken();
+          if (blobRetry) {
+            console.log("[guesty/auth] found token in Blobs after wait");
+            global.__guestyToken = blobRetry;
+            return blobRetry.value;
+          }
+        }
+
+        const res = await fetch(TOKEN_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            grant_type: "client_credentials",
+            client_id: clientId,
+            client_secret: clientSecret,
+            scope: "open-api",
+          }),
+          cache: "no-store",
+        });
+
+        if (res.ok) {
+          const data = (await res.json()) as { access_token: string; expires_in: number };
+          const expiresAt = Date.now() + Math.max(0, data.expires_in - 300) * 1000;
+          const entry = { value: data.access_token, expiresAt };
+          global.__guestyToken = entry;
+          await blobWriteToken(entry.value, entry.expiresAt);
+          return entry.value;
+        }
+
         const text = await res.text();
-        throw new GuestyAPIError(`Guesty auth failed (${res.status}): ${text}`, res.status, "/oauth2/token");
+        lastErr = new GuestyAPIError(`Guesty auth failed (${res.status}): ${text}`, res.status, "/oauth2/token");
+        console.error(`[guesty/auth] attempt ${attempt + 1} failed:`, lastErr.message);
+
+        if (res.status !== 429) break; // only retry on rate limit
       }
 
-      const data = (await res.json()) as { access_token: string; expires_in: number };
-      const expiresAt = Date.now() + Math.max(0, data.expires_in - 300) * 1000;
-      const entry = { value: data.access_token, expiresAt };
-
-      global.__guestyToken = entry;
-      await blobWriteToken(entry.value, entry.expiresAt); // store in Blobs for other instances
-      return entry.value;
+      throw lastErr!;
     } finally {
       global.__guestyTokenFlight = undefined;
     }
