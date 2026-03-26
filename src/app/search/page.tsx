@@ -1,11 +1,24 @@
 "use client";
-import { useState, useEffect, useMemo, useRef, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, Suspense, Component } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import Nav from "@/components/Nav";
 import type { GuestyListingFull } from "@/lib/guesty";
+
+// Error boundary prevents PropertyMap Leaflet errors from crashing the page
+class MapErrorBoundary extends Component<
+  { children: React.ReactNode },
+  { error: boolean }
+> {
+  state = { error: false };
+  static getDerivedStateFromError() { return { error: true }; }
+  render() {
+    if (this.state.error) return <div className="w-full h-full bg-[#EDE8DF] flex items-center justify-center text-[#8A7968] text-sm">Map unavailable</div>;
+    return this.props.children;
+  }
+}
 import {
   MapPin, CalendarDays, Users, ChevronLeft, ChevronRight,
   SlidersHorizontal, Search, RotateCcw, BedDouble, Bath, ImageOff,
@@ -143,7 +156,7 @@ function StayCard({
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function SearchPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<div className="h-screen bg-[#F7F4EF]" />}>
       <SearchPageInner />
     </Suspense>
   );
@@ -433,11 +446,13 @@ function SearchPageInner() {
 
         {/* RIGHT: map */}
         <div className="hidden lg:block flex-1 sticky top-0 h-full">
-          <PropertyMap
-            listings={results}
-            hoveredId={hoveredId}
-            onHover={setHoveredId}
-          />
+          <MapErrorBoundary>
+            <PropertyMap
+              listings={results}
+              hoveredId={hoveredId}
+              onHover={setHoveredId}
+            />
+          </MapErrorBoundary>
         </div>
 
       </div>
