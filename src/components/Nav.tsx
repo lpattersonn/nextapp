@@ -387,7 +387,7 @@ export default function Nav() {
                   key={p.slug}
                   href={`/property/${p.slug}`}
                   onClick={() => setMenuOpen(false)}
-                  className="relative h-[110px] rounded-xl overflow-hidden block"
+                  className="relative h-[180px] rounded-xl overflow-hidden block"
                 >
                   <Image src={p.images[0]} alt={p.name} fill className="object-cover" unoptimized />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
