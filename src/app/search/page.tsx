@@ -279,7 +279,7 @@ function SearchPageInner() {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-[#F7F4EF]">
+    <div className="flex flex-col min-h-screen lg:h-screen lg:overflow-hidden bg-[#F7F4EF]">
       <Nav />
 
       {/* ── TOP SEARCH BAR ── */}
@@ -386,10 +386,10 @@ function SearchPageInner() {
       </div>
 
       {/* ── MAIN: results + map ── */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex lg:flex-1 lg:min-h-0">
 
         {/* LEFT: results list */}
-        <div className="flex flex-col w-full lg:w-[58%] min-h-0">
+        <div className="flex flex-col w-full lg:w-[58%] lg:min-h-0">
 
           {/* Results count + sort */}
           <div className="shrink-0 flex items-center justify-between px-5 py-3 bg-white border-b border-[#EDE8DF]">
@@ -415,7 +415,7 @@ function SearchPageInner() {
           </div>
 
           {/* Cards grid */}
-          <div className="flex-1 overflow-y-auto px-4 py-5">
+          <div className="lg:flex-1 lg:overflow-y-auto px-4 py-5">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 {[...Array(4)].map((_, i) => (
