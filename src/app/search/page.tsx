@@ -21,9 +21,11 @@ class MapErrorBoundary extends Component<
 }
 import {
   MapPin, CalendarDays, Users, ChevronLeft, ChevronRight,
-  SlidersHorizontal, Search, RotateCcw, BedDouble, Bath, ImageOff,
+  Search, RotateCcw, BedDouble, Bath, ImageOff,
   Star, Heart, Waves, Mountain, Gem, Crown,
 } from "lucide-react";
+
+const LOCATION_OPTIONS = ["Joshua Tree", "Pioneertown", "Twentynine Palms", "Yucca Valley"];
 
 type CategoryIcon = React.ComponentType<{ size?: number; strokeWidth?: number }>;
 
@@ -289,12 +291,16 @@ function SearchPageInner() {
             <MapPin size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
             <input
               type="text"
-              placeholder="Joshua Tree, Yucca Valley"
+              placeholder="Anywhere"
+              list="search-locations"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="text-[13px] text-[#1C1410] placeholder-[#9A8A7A] outline-none bg-transparent w-full"
             />
+            <datalist id="search-locations">
+              {LOCATION_OPTIONS.map((loc) => <option key={loc} value={loc} />)}
+            </datalist>
           </label>
 
           {/* Dates */}
@@ -327,24 +333,26 @@ function SearchPageInner() {
           </div>
 
           {/* Guests */}
-          <label className="flex items-center gap-2 bg-[#F7F4EF] rounded-full px-4 py-2.5 cursor-pointer">
+          <div className="flex items-center gap-2 bg-[#F7F4EF] rounded-full px-4 py-2.5">
             <Users size={14} color="#7B5B3A" strokeWidth={2} className="shrink-0" />
-            <select
-              value={guests}
-              onChange={(e) => setGuests(Number(e.target.value))}
-              className="text-[13px] text-[#1C1410] bg-transparent outline-none cursor-pointer"
-            >
-              <option value={1}>Select Guests</option>
-              {[2,3,4,5,6,7,8,9,10,12,14,16].map((n) => (
-                <option key={n} value={n}>{n} Guests</option>
-              ))}
-            </select>
-          </label>
-
-          {/* Filter button */}
-          <button className="flex items-center gap-2 bg-[#F7F4EF] border border-[#E0D8CE] rounded-full px-4 py-2.5 text-[13px] text-[#5A4A3A] hover:bg-[#EDE8DF] transition-colors cursor-pointer">
-            <SlidersHorizontal size={14} color="#7B5B3A" strokeWidth={2} />
-          </button>
+            <span className="text-[13px] text-[#1C1410] whitespace-nowrap">
+              {guests} Guest{guests !== 1 ? "s" : ""}
+            </span>
+            <div className="flex items-center gap-2 ml-1">
+              <button
+                type="button"
+                onClick={() => setGuests((g) => Math.max(1, g - 1))}
+                className="w-5 h-5 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[14px] leading-none hover:bg-white transition-colors cursor-pointer"
+                aria-label="Fewer guests"
+              >−</button>
+              <button
+                type="button"
+                onClick={() => setGuests((g) => Math.min(16, g + 1))}
+                className="w-5 h-5 rounded-full border border-[#C4A882] flex items-center justify-center text-[#7B5B3A] text-[14px] leading-none hover:bg-white transition-colors cursor-pointer"
+                aria-label="More guests"
+              >+</button>
+            </div>
+          </div>
 
           {/* Search */}
           <button
