@@ -28,17 +28,17 @@ function fmt(iso: string) {
   return new Date(y, m - 1, d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-/** Defers video download until after first user interaction or page idle.
- *  Poster image is shown immediately — no layout shift, no blocked paint. */
+/** Defers video download until page is idle.
+ *  Poster renders immediately as a plain <img> so the hero is never grey.
+ *  The video fades in on top once it can play. */
 function LazyVideo({ src, poster }: { src: string; poster: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [visible, setVisible] = useState(false);
+  const [videoVisible, setVideoVisible] = useState(false);
 
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
 
-    // Start loading video once the browser is idle (after critical resources)
     const load = () => {
       el.preload = "auto";
       el.load();
@@ -55,19 +55,30 @@ function LazyVideo({ src, poster }: { src: string; poster: string }) {
   }, []);
 
   return (
-    <video
-      ref={videoRef}
-      muted
-      loop
-      playsInline
-      preload="none"
-      poster={poster}
-      onCanPlay={() => setVisible(true)}
-      className="w-full h-full object-cover object-center transition-opacity duration-700"
-      style={{ opacity: visible ? 1 : 0 }}
-    >
-      <source src={src} type="video/mp4" />
-    </video>
+    <div className="relative w-full h-full">
+      {/* Poster image — visible immediately, acts as background until video plays */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={poster}
+        alt=""
+        aria-hidden="true"
+        fetchPriority="high"
+        className="absolute inset-0 w-full h-full object-cover object-center"
+      />
+      {/* Video fades in over the poster once ready */}
+      <video
+        ref={videoRef}
+        muted
+        loop
+        playsInline
+        preload="none"
+        onCanPlay={() => setVideoVisible(true)}
+        className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700"
+        style={{ opacity: videoVisible ? 1 : 0 }}
+      >
+        <source src={src} type="video/mp4" />
+      </video>
+    </div>
   );
 }
 
