@@ -336,7 +336,7 @@ export default function Nav() {
 
     {/* Mobile drawer — portalled to body so backdrop-filter on nav doesn't clip it */}
     {mounted && createPortal(
-      <>
+      <div className="md:hidden">
         {/* Overlay */}
         {menuOpen && (
           <div
@@ -436,7 +436,7 @@ export default function Nav() {
             </div>
           </div>
         </div>
-      </>,
+      </div>,
       document.body
     )}
   </>
